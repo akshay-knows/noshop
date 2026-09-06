@@ -1,0 +1,5 @@
+Get-ChildItem -Recurse -Include *.java,*.properties,*.yml,*.yaml,*.xml | ForEach-Object {
+    "==== FILE: $($_.FullName) ====" | Out-File all_code.txt -Append
+    Get-Content $_.FullName | Out-File all_code.txt -Append
+    "" | Out-File all_code.txt -Append
+}
