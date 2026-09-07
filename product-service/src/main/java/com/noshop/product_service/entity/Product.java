@@ -3,6 +3,8 @@ package com.noshop.product_service.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "products")
 @Getter
@@ -16,16 +18,29 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false,length = 200)
+    @Column(nullable = false, length = 200)
     private String name;
 
-    @Column(nullable = false,unique = true)
+    @Column(nullable = false, unique = true)
     private String slug;
 
     @Lob
     private String description;
 
+    @Column(length = 50)
+    private String productType;
+
+    @Column(length = 30)
+    private String unit;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal packSize;
+
+    @Column(precision = 10, scale = 2)
+    private BigDecimal price;
+
     @Builder.Default
+    @Column(nullable = false)
     private boolean active = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,11 +54,4 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subcategory_id", nullable = false)
     private SubCategory subCategory;
-
-
-//    @Builder.Default
-//    @OneToMany(mappedBy = "product",
-//            cascade = CascadeType.ALL,
-//            orphanRemoval = true)
-//    private List<ProductVariant> variants = new ArrayList<>();
 }
