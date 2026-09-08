@@ -16,17 +16,35 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findBySlug(String slug);
 
-    boolean existsBySlugAndIdNot(String slug,
-                                 Long id);
+    @Query("""
+            SELECT DISTINCT p
+            FROM Product p
+            LEFT JOIN FETCH p.images
+            WHERE p.id = :id
+            """)
+    Optional<Product> findByIdWithImages(
+            @Param("id") Long id
+    );
 
-    Page<Product> findByCategoryId(Long categoryId,
-                                   Pageable pageable);
+    boolean existsBySlugAndIdNot(
+            String slug,
+            Long id
+    );
 
-    Page<Product> findBySubCategoryId(Long subCategoryId,
-                                      Pageable pageable);
+    Page<Product> findByCategoryId(
+            Long categoryId,
+            Pageable pageable
+    );
 
-    Page<Product> findByStatus(ProductStatus status,
-                               Pageable pageable);
+    Page<Product> findBySubCategoryId(
+            Long subCategoryId,
+            Pageable pageable
+    );
+
+    Page<Product> findByStatus(
+            ProductStatus status,
+            Pageable pageable
+    );
 
     Page<Product> findByCategoryIdAndStatus(
             Long categoryId,
@@ -41,11 +59,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     );
 
     @Query("""
-        SELECT p
-        FROM Product p
-        WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%'))
-           OR LOWER(p.description) LIKE LOWER(CONCAT('%', :query, '%'))
-        """)
+            SELECT p
+            FROM Product p
+            WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :query, '%'))
+               OR LOWER(p.description) LIKE LOWER(CONCAT('%', :query, '%'))
+            """)
     Page<Product> searchProducts(
             @Param("query") String query,
             Pageable pageable

@@ -128,14 +128,12 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse getProductById(Long id) {
-
-        Product product = productRepository.findById(id)
-                                           .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
-
+        Product product = productRepository.findByIdWithImages(id)
+                                           .orElseThrow(() -> new ResourceNotFoundException(
+                                                   "Product not found with id: " + id));
 
         return productMapper.toResponse(product);
     }
-
 
     @Override
     public ProductResponse updateProduct(Long id,
