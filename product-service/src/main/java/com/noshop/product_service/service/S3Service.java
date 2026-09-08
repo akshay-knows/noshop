@@ -14,4 +14,8 @@ public interface S3Service {
     void deleteFile(
             String storageKey
     );
+
+    boolean objectExists(
+            String storageKey
+    );
 }

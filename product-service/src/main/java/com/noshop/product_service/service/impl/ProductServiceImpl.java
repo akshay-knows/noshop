@@ -142,42 +142,7 @@ public class ProductServiceImpl implements ProductService {
             products = productRepository.findAll(pageable);
         }
 
-        List<Long> productIds = products.getContent()
-                                        .stream()
-                                        .map(Product::getId)
-                                        .toList();
-
-        Map<Long, List<ProductImage>> imagesByProductId =
-                productIds.isEmpty()
-                        ? Collections.emptyMap()
-                        : productImageRepository
-                          .findByProductIdInOrderByDisplayOrderAsc(
-                                  productIds
-                          )
-                          .stream()
-                          .collect(Collectors.groupingBy(
-                                  image -> image.getProduct().getId()
-                          ));
-
-        return products.map(product -> {
-
-            ProductResponse response =
-                    productMapper.toResponse(product);
-
-            List<ProductImage> images =
-                    imagesByProductId.getOrDefault(
-                            product.getId(),
-                            Collections.emptyList()
-                    );
-
-            response.setImages(
-                    images.stream()
-                          .map(productMapper::toImageResponse)
-                          .toList()
-            );
-
-            return response;
-        });
+        return mapProductsWithImages(products);
     }
 
 
@@ -271,11 +236,13 @@ public class ProductServiceImpl implements ProductService {
             String query,
             Pageable pageable) {
 
-        return productRepository.searchProducts(
-                                        query,
-                                        pageable
-                                )
-                                .map(productMapper::toResponse);
+        Page<Product> products =
+                productRepository.searchProducts(
+                        query,
+                        pageable
+                );
+
+        return mapProductsWithImages(products);
     }
 
 
@@ -302,5 +269,47 @@ public class ProductServiceImpl implements ProductService {
         Product savedProduct = productRepository.save(product);
 
         return productMapper.toResponse(savedProduct);
+    }
+
+
+    private Page<ProductResponse> mapProductsWithImages(
+            Page<Product> products) {
+
+        List<Long> productIds = products.getContent()
+                                        .stream()
+                                        .map(Product::getId)
+                                        .toList();
+
+        if (productIds.isEmpty()) {
+            return products.map(productMapper::toResponse);
+        }
+
+        Map<Long, List<ProductImage>> imagesByProductId =
+                productImageRepository
+                        .findByProductIdInOrderByDisplayOrderAsc(productIds)
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                image -> image.getProduct().getId()
+                        ));
+
+        return products.map(product -> {
+
+            ProductResponse response =
+                    productMapper.toResponse(product);
+
+            List<ProductImage> images =
+                    imagesByProductId.getOrDefault(
+                            product.getId(),
+                            Collections.emptyList()
+                    );
+
+            response.setImages(
+                    images.stream()
+                          .map(productMapper::toImageResponse)
+                          .toList()
+            );
+
+            return response;
+        });
     }
 }

@@ -23,9 +23,13 @@ import java.util.UUID;
 public class ProductImageServiceImpl implements ProductImageService {
 
     private final ProductImageRepository productImageRepository;
+
     private final ProductRepository productRepository;
+
     private final ProductMapper productMapper;
+
     private final S3Service s3Service;
+
 
     @Override
     public List<ProductImageResponse> getImagesByProductId(
@@ -44,8 +48,10 @@ public class ProductImageServiceImpl implements ProductImageService {
                 .toList();
     }
 
+
     @Override
-    public ProductImageResponse getPrimaryImage(Long productId) {
+    public ProductImageResponse getPrimaryImage(
+            Long productId) {
 
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException(
@@ -54,7 +60,10 @@ public class ProductImageServiceImpl implements ProductImageService {
         }
 
         ProductImage image = productImageRepository
-                .findByProductIdAndDisplayOrder(productId, 1)
+                .findByProductIdAndDisplayOrder(
+                        productId,
+                        1
+                )
                 .orElse(null);
 
         if (image == null) {
@@ -63,6 +72,7 @@ public class ProductImageServiceImpl implements ProductImageService {
 
         return productMapper.toImageResponse(image);
     }
+
 
     @Override
     public ImageUploadResponse generateUploadUrl(
@@ -75,7 +85,15 @@ public class ProductImageServiceImpl implements ProductImageService {
             );
         }
 
-        String extension = getFileExtension(request.getFileName());
+        String extension =
+                getFileExtension(
+                        request.getFileName()
+                );
+
+        validateFileExtension(
+                request.getFileName(),
+                request.getContentType()
+        );
 
         String storageKey =
                 "products/"
@@ -91,7 +109,9 @@ public class ProductImageServiceImpl implements ProductImageService {
                 );
 
         String imageUrl =
-                s3Service.buildCloudFrontUrl(storageKey);
+                s3Service.buildCloudFrontUrl(
+                        storageKey
+                );
 
         return ImageUploadResponse.builder()
                                   .uploadUrl(uploadUrl)
@@ -99,6 +119,7 @@ public class ProductImageServiceImpl implements ProductImageService {
                                   .imageUrl(imageUrl)
                                   .build();
     }
+
 
     @Override
     public ProductImageResponse confirmUpload(
@@ -110,7 +131,8 @@ public class ProductImageServiceImpl implements ProductImageService {
         Product product = productRepository.findById(productId)
                                            .orElseThrow(() ->
                                                                 new ResourceNotFoundException(
-                                                                        "Product not found with id: " + productId
+                                                                        "Product not found with id: "
+                                                                                + productId
                                                                 )
                                            );
 
@@ -123,7 +145,8 @@ public class ProductImageServiceImpl implements ProductImageService {
         if (productImageRepository
                 .existsByProductIdAndDisplayOrder(
                         productId,
-                        displayOrder)) {
+                        displayOrder
+                )) {
 
             throw new IllegalArgumentException(
                     "Image display order already exists: "
@@ -131,8 +154,32 @@ public class ProductImageServiceImpl implements ProductImageService {
             );
         }
 
+        // Security validation:
+        // Make sure the storage key belongs to this product.
+        validateStorageKey(
+                productId,
+                storageKey
+        );
+
+        // Make sure the file extension matches
+        // the declared content type.
+        validateFileExtension(
+                request.getFileName(),
+                request.getContentType()
+        );
+
+        // Make sure the client actually uploaded
+        // the object to S3 before saving metadata.
+        if (!s3Service.objectExists(storageKey)) {
+            throw new IllegalArgumentException(
+                    "Uploaded image does not exist in S3"
+            );
+        }
+
         String imageUrl =
-                s3Service.buildCloudFrontUrl(storageKey);
+                s3Service.buildCloudFrontUrl(
+                        storageKey
+                );
 
         ProductImage image = ProductImage.builder()
                                          .imageUrl(imageUrl)
@@ -146,11 +193,15 @@ public class ProductImageServiceImpl implements ProductImageService {
         ProductImage savedImage =
                 productImageRepository.save(image);
 
-        return productMapper.toImageResponse(savedImage);
+        return productMapper.toImageResponse(
+                savedImage
+        );
     }
 
+
     @Override
-    public void deleteImage(Long imageId) {
+    public void deleteImage(
+            Long imageId) {
 
         ProductImage image = productImageRepository
                 .findById(imageId)
@@ -162,22 +213,105 @@ public class ProductImageServiceImpl implements ProductImageService {
                 );
 
         if (image.getStorageKey() != null) {
-            s3Service.deleteFile(image.getStorageKey());
+
+            s3Service.deleteFile(
+                    image.getStorageKey()
+            );
         }
 
         productImageRepository.delete(image);
     }
 
-    private String getFileExtension(String fileName) {
 
-        int lastDot = fileName.lastIndexOf('.');
+    private void validateStorageKey(
+            Long productId,
+            String storageKey) {
+
+        if (storageKey == null ||
+                storageKey.isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Storage key is required"
+            );
+        }
+
+        String expectedPrefix =
+                "products/"
+                        + productId
+                        + "/images/";
+
+        if (!storageKey.startsWith(expectedPrefix)) {
+
+            throw new IllegalArgumentException(
+                    "Invalid storage key for product"
+            );
+        }
+    }
+
+
+    private void validateFileExtension(
+            String fileName,
+            String contentType) {
+
+        if (fileName == null ||
+                fileName.isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "File name is required"
+            );
+        }
+
+        if (contentType == null ||
+                contentType.isBlank()) {
+
+            throw new IllegalArgumentException(
+                    "Content type is required"
+            );
+        }
+
+        String lowerFileName =
+                fileName.toLowerCase();
+
+        boolean valid = switch (contentType.toLowerCase()) {
+
+            case "image/jpeg",
+                 "image/jpg" ->
+                    lowerFileName.endsWith(".jpg")
+                            || lowerFileName.endsWith(".jpeg");
+
+            case "image/png" ->
+                    lowerFileName.endsWith(".png");
+
+            case "image/webp" ->
+                    lowerFileName.endsWith(".webp");
+
+            default -> false;
+        };
+
+        if (!valid) {
+
+            throw new IllegalArgumentException(
+                    "File extension does not match content type"
+            );
+        }
+    }
+
+
+    private String getFileExtension(
+            String fileName) {
+
+        int lastDot =
+                fileName.lastIndexOf('.');
 
         if (lastDot == -1) {
+
             throw new IllegalArgumentException(
                     "File must have an extension"
             );
         }
 
-        return fileName.substring(lastDot).toLowerCase();
+        return fileName
+                .substring(lastDot)
+                .toLowerCase();
     }
 }
