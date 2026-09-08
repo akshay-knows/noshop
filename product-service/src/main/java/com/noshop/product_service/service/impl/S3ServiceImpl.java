@@ -4,53 +4,69 @@ import com.noshop.product_service.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.presigner.S3Presigner;
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
-import java.io.IOException;
-import java.util.UUID;
+import java.time.Duration;
 
 @Service
 @RequiredArgsConstructor
 public class S3ServiceImpl implements S3Service {
+
     private final S3Client s3Client;
+    private final S3Presigner s3Presigner;
+
     @Value("${aws.s3.bucket}")
     private String bucketName;
-    @Value("${aws.region}")
-    private String region;
+
+    @Value("${aws.cloudfront.domain}")
+    private String cloudFrontDomain;
 
     @Override
-    public String uploadFile(MultipartFile file,
-                             Long productId) throws IOException {
-        String filename = "products/" + productId + "/" + UUID.randomUUID() + "-" + file.getOriginalFilename();
+    public String generatePresignedUploadUrl(
+            String storageKey,
+            String contentType) {
 
-        s3Client.putObject(
+        PutObjectRequest putObjectRequest =
                 PutObjectRequest.builder()
                                 .bucket(bucketName)
-                                .key(filename)
-                                .contentType(file.getContentType())
-                                .build(),
-                RequestBody.fromInputStream(
-                        file.getInputStream(),
-                        file.getSize()
-                )
-        );
-        return "https://%s.s3.%s.amazonaws.com/%s".formatted(
-                bucketName,
-                region,
-                filename
-        );
+                                .key(storageKey)
+                                .contentType(contentType)
+                                .build();
+
+        PutObjectPresignRequest presignRequest =
+                PutObjectPresignRequest.builder()
+                                       .signatureDuration(Duration.ofMinutes(10))
+                                       .putObjectRequest(putObjectRequest)
+                                       .build();
+
+        return s3Presigner
+                .presignPutObject(presignRequest)
+                .url()
+                .toString();
     }
+
     @Override
-    public void deleteFile(String s3Key) {
-        s3Client.deleteObject(DeleteObjectRequest.builder()
-                                                 .bucket(bucketName)
-                                                 .key(s3Key)
-                                                 .build());
+    public String buildCloudFrontUrl(String storageKey) {
+
+        return "https://%s/%s"
+                .formatted(
+                        cloudFrontDomain,
+                        storageKey
+                );
     }
 
+    @Override
+    public void deleteFile(String storageKey) {
 
+        s3Client.deleteObject(
+                DeleteObjectRequest.builder()
+                                   .bucket(bucketName)
+                                   .key(storageKey)
+                                   .build()
+        );
+    }
 }

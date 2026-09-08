@@ -5,11 +5,9 @@ import com.noshop.product_service.dto.request.CreateProductVariantRequest;
 import com.noshop.product_service.dto.response.ProductVariantResponse;
 import com.noshop.product_service.entity.Product;
 import com.noshop.product_service.entity.ProductVariant;
-import com.noshop.product_service.entity.Size;
-import com.noshop.product_service.mapper.ProductVariantMapper;
+import com.noshop.product_service.mapper.ProductMapper;
 import com.noshop.product_service.repository.ProductRepository;
 import com.noshop.product_service.repository.ProductVariantRepository;
-import com.noshop.product_service.repository.SizeRepository;
 import com.noshop.product_service.service.ProductVariantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,87 +20,116 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
     private final ProductVariantRepository productVariantRepository;
     private final ProductRepository productRepository;
-    private final SizeRepository sizeRepository;
-    private final ProductVariantMapper productVariantMapper;
+    private final ProductMapper productMapper;
 
     @Override
-    public ProductVariantResponse createProductVariant(CreateProductVariantRequest request) {
+    public ProductVariantResponse createVariant(
+            Long productId,
+            CreateProductVariantRequest request) {
 
         if (productVariantRepository.existsBySku(request.getSku())) {
-            throw new IllegalArgumentException("SKU already exists.");
+            throw new IllegalArgumentException(
+                    "Variant SKU already exists: " + request.getSku()
+            );
         }
 
-        Product product = productRepository.findById(request.getProductId())
+        Product product = productRepository.findById(productId)
                                            .orElseThrow(() ->
-                                                                new ResourceNotFoundException("Product not found."));
+                                                                new ResourceNotFoundException(
+                                                                        "Product not found with id: " + productId
+                                                                )
+                                           );
 
-        Size size = sizeRepository.findById(request.getSizeId())
-                                  .orElseThrow(() ->
-                                                       new ResourceNotFoundException("Size not found."));
+        ProductVariant variant = ProductVariant.builder()
+                                               .sku(request.getSku())
+                                               .packSize(request.getPackSize())
+                                               .unit(request.getUnit())
+                                               .price(request.getPrice())
+                                               .product(product)
+                                               .build();
 
-        ProductVariant productVariant = productVariantMapper.toEntity(request);
-        productVariant.setProduct(product);
-        productVariant.setSize(size);
-
-        return productVariantMapper.toResponse(
-                productVariantRepository.save(productVariant)
+        return productMapper.toVariantResponse(
+                productVariantRepository.save(variant)
         );
     }
 
     @Override
-    public ProductVariantResponse getProductVariantById(Long id) {
+    public List<ProductVariantResponse> getVariantsByProductId(
+            Long productId) {
 
-        ProductVariant productVariant = productVariantRepository.findById(id)
-                                                                .orElseThrow(() ->
-                                                                                     new ResourceNotFoundException("Product Variant not found."));
+        if (!productRepository.existsById(productId)) {
+            throw new ResourceNotFoundException(
+                    "Product not found with id: " + productId
+            );
+        }
 
-        return productVariantMapper.toResponse(productVariant);
+        return productVariantRepository
+                .findByProductId(productId)
+                .stream()
+                .map(productMapper::toVariantResponse)
+                .toList();
     }
 
     @Override
-    public List<ProductVariantResponse> getAllProductVariants() {
+    public ProductVariantResponse getVariantById(Long variantId) {
 
-        return productVariantRepository.findAll()
-                                       .stream()
-                                       .map(productVariantMapper::toResponse)
-                                       .toList();
+        ProductVariant variant =
+                productVariantRepository.findById(variantId)
+                                        .orElseThrow(() ->
+                                                             new ResourceNotFoundException(
+                                                                     "Variant not found with id: "
+                                                                             + variantId
+                                                             )
+                                        );
+
+        return productMapper.toVariantResponse(variant);
     }
 
     @Override
-    public ProductVariantResponse updateProductVariant(Long id,
-                                                       CreateProductVariantRequest request) {
+    public ProductVariantResponse updateVariant(
+            Long variantId,
+            CreateProductVariantRequest request) {
 
-        ProductVariant productVariant = productVariantRepository.findById(id)
-                                                                .orElseThrow(() ->
-                                                                                     new ResourceNotFoundException("Product Variant not found."));
+        ProductVariant variant =
+                productVariantRepository.findById(variantId)
+                                        .orElseThrow(() ->
+                                                             new ResourceNotFoundException(
+                                                                     "Variant not found with id: "
+                                                                             + variantId
+                                                             )
+                                        );
 
-        Product product = productRepository.findById(request.getProductId())
-                                           .orElseThrow(() ->
-                                                                new ResourceNotFoundException("Product not found."));
+        if (productVariantRepository.existsBySkuAndIdNot(
+                request.getSku(),
+                variantId)) {
 
-        Size size = sizeRepository.findById(request.getSizeId())
-                                  .orElseThrow(() ->
-                                                       new ResourceNotFoundException("Size not found."));
+            throw new IllegalArgumentException(
+                    "Variant SKU already exists: " + request.getSku()
+            );
+        }
 
-        productVariant.setSku(request.getSku());
-        productVariant.setColor(request.getColor());
-        productVariant.setMrp(request.getMrp());
-        productVariant.setSellingPrice(request.getSellingPrice());
-        productVariant.setProduct(product);
-        productVariant.setSize(size);
+        variant.setSku(request.getSku());
+        variant.setPackSize(request.getPackSize());
+        variant.setUnit(request.getUnit());
+        variant.setPrice(request.getPrice());
 
-        return productVariantMapper.toResponse(
-                productVariantRepository.save(productVariant)
+        return productMapper.toVariantResponse(
+                productVariantRepository.save(variant)
         );
     }
 
     @Override
-    public void deleteProductVariant(Long id) {
+    public void deleteVariant(Long variantId) {
 
-        ProductVariant productVariant = productVariantRepository.findById(id)
-                                                                .orElseThrow(() ->
-                                                                                     new ResourceNotFoundException("Product Variant not found."));
+        ProductVariant variant =
+                productVariantRepository.findById(variantId)
+                                        .orElseThrow(() ->
+                                                             new ResourceNotFoundException(
+                                                                     "Variant not found with id: "
+                                                                             + variantId
+                                                             )
+                                        );
 
-        productVariantRepository.delete(productVariant);
+        productVariantRepository.delete(variant);
     }
 }

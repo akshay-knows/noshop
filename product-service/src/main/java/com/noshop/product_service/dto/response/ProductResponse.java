@@ -17,7 +17,9 @@ public class ProductResponse {
 
     private String description;
 
-    private boolean active;
+    private String productType;
+
+    private String status;
 
     private Long brandId;
 
@@ -32,5 +34,4 @@ public class ProductResponse {
     private String subCategoryName;
 
     private List<ProductImageResponse> images;
-
 }

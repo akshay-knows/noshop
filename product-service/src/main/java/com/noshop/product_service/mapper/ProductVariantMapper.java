@@ -13,8 +13,6 @@ public interface ProductVariantMapper {
 
     @Mapping(target = "productId", source = "product.id")
     @Mapping(target = "productName", source = "product.name")
-    @Mapping(target = "sizeId", source = "size.id")
-    @Mapping(target = "sizeName", source = "size.name")
     ProductVariantResponse toResponse(ProductVariant productVariant);
 
 }

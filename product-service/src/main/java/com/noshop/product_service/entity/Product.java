@@ -1,9 +1,11 @@
 package com.noshop.product_service.entity;
 
+import com.noshop.product_service.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -30,18 +32,11 @@ public class Product {
     @Column(length = 50)
     private String productType;
 
-    @Column(length = 30)
-    private String unit;
-
-    @Column(precision = 10, scale = 2)
-    private BigDecimal packSize;
-
-    @Column(precision = 10, scale = 2)
-    private BigDecimal price;
 
     @Builder.Default
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private boolean active = true;
+    private ProductStatus status = ProductStatus.ACTIVE;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id", nullable = false)
@@ -54,4 +49,17 @@ public class Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "subcategory_id", nullable = false)
     private SubCategory subCategory;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
+    private List<ProductVariant> variants = new ArrayList<>();
+
+    @OneToMany(
+            mappedBy = "product",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @OrderBy("displayOrder ASC")
+    @Builder.Default
+    private List<ProductImage> images = new ArrayList<>();
 }

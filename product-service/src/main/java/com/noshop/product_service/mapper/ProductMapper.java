@@ -4,11 +4,9 @@ import com.noshop.product_service.dto.request.CreateProductRequest;
 import com.noshop.product_service.dto.response.ProductImageResponse;
 import com.noshop.product_service.dto.response.ProductResponse;
 import com.noshop.product_service.dto.response.ProductVariantResponse;
-import com.noshop.product_service.dto.response.SizeResponse;
 import com.noshop.product_service.entity.Product;
 import com.noshop.product_service.entity.ProductImage;
 import com.noshop.product_service.entity.ProductVariant;
-import com.noshop.product_service.entity.Size;
 import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 
@@ -40,5 +38,4 @@ public interface ProductMapper {
     ProductImageResponse toImageResponse(ProductImage image);
 
 
-    SizeResponse toSizeResponse(Size size);
 }

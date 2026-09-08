@@ -13,19 +13,15 @@ public class ProductVariantResponse {
 
     private String sku;
 
-    private String color;
+    private BigDecimal packSize;
 
-    private BigDecimal mrp;
+    private String unit;
 
-    private BigDecimal sellingPrice;
+    private BigDecimal price;
 
-    private boolean active;
+    private String status;
 
     private Long productId;
 
     private String productName;
-
-    private Long sizeId;
-
-    private String sizeName;
 }

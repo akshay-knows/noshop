@@ -7,6 +7,7 @@ import com.noshop.product_service.entity.Brand;
 import com.noshop.product_service.entity.Category;
 import com.noshop.product_service.entity.Product;
 import com.noshop.product_service.entity.SubCategory;
+import com.noshop.product_service.enums.ProductStatus;
 import com.noshop.product_service.mapper.ProductMapper;
 import com.noshop.product_service.repository.BrandRepository;
 import com.noshop.product_service.repository.CategoryRepository;
@@ -15,9 +16,9 @@ import com.noshop.product_service.repository.SubCategoryRepository;
 import com.noshop.product_service.service.ProductService;
 import com.noshop.product_service.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +40,10 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse createProduct(CreateProductRequest request) {
+
+        if (productRepository.existsBySlug(request.getSlug())) {
+            throw new RuntimeException("Product slug already exists");
+        }
 
         Brand brand = brandRepository.findById(request.getBrandId())
                                      .orElseThrow(() -> new ResourceNotFoundException("Brand not found with id: " + request.getBrandId()));
@@ -63,12 +68,61 @@ public class ProductServiceImpl implements ProductService {
 
 
     @Override
-    public List<ProductResponse> getAllProducts() {
+    public Page<ProductResponse> getAllProducts(Long categoryId,
+                                                Long subCategoryId,
+                                                ProductStatus status,
+                                                Pageable pageable) {
 
-        return productRepository.findAll()
-                                .stream()
-                                .map(productMapper::toResponse)
-                                .toList();
+        Page<Product> products;
+
+        if (categoryId != null && status != null) {
+
+            products = productRepository.findByCategoryIdAndStatus(
+                    categoryId,
+                    status,
+                    pageable
+            );
+
+        }
+        else if (subCategoryId != null && status != null) {
+
+            products = productRepository.findBySubCategoryIdAndStatus(
+                    subCategoryId,
+                    status,
+                    pageable
+            );
+
+        }
+        else if (categoryId != null) {
+
+            products = productRepository.findByCategoryId(
+                    categoryId,
+                    pageable
+            );
+
+        }
+        else if (subCategoryId != null) {
+
+            products = productRepository.findBySubCategoryId(
+                    subCategoryId,
+                    pageable
+            );
+
+        }
+        else if (status != null) {
+
+            products = productRepository.findByStatus(
+                    status,
+                    pageable
+            );
+
+        }
+        else {
+
+            products = productRepository.findAll(pageable);
+        }
+
+        return products.map(productMapper::toResponse);
     }
 
 
@@ -91,6 +145,12 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id)
                                            .orElseThrow(() -> new ResourceNotFoundException("Product not found with id: " + id));
 
+        if (productRepository.existsBySlugAndIdNot(
+                request.getSlug(),
+                id
+        )) {
+            throw new RuntimeException("Product slug already exists");
+        }
 
         Brand brand = brandRepository.findById(request.getBrandId())
                                      .orElseThrow(() -> new ResourceNotFoundException("Brand not found"));
@@ -129,5 +189,37 @@ public class ProductServiceImpl implements ProductService {
 
 
         productRepository.delete(product);
+    }
+    @Override
+    public Page<ProductResponse> searchProducts(
+            String query,
+            Pageable pageable) {
+
+        return productRepository.searchProducts(query, pageable)
+                                .map(productMapper::toResponse);
+    }
+    @Override
+    public ProductResponse updateProductStatus(
+            Long id,
+            ProductStatus status) {
+
+        Product product = productRepository.findById(id)
+                                           .orElseThrow(() ->
+                                                                new ResourceNotFoundException(
+                                                                        "Product not found with id: " + id
+                                                                )
+                                           );
+
+        if (product.getStatus() == ProductStatus.DISCONTINUED) {
+            throw new IllegalStateException(
+                    "Discontinued product cannot be reactivated"
+            );
+        }
+
+        product.setStatus(status);
+
+        Product savedProduct = productRepository.save(product);
+
+        return productMapper.toResponse(savedProduct);
     }
 }

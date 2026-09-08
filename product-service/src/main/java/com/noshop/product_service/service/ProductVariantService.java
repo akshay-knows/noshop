@@ -6,16 +6,13 @@ import com.noshop.product_service.dto.response.ProductVariantResponse;
 import java.util.List;
 
 public interface ProductVariantService {
+    ProductVariantResponse createVariant(Long productId, CreateProductVariantRequest request);
 
-    ProductVariantResponse createProductVariant(CreateProductVariantRequest request);
+    List<ProductVariantResponse> getVariantsByProductId(Long productId);
 
-    ProductVariantResponse getProductVariantById(Long id);
+    ProductVariantResponse getVariantById(Long variantId);
 
-    List<ProductVariantResponse> getAllProductVariants();
+    ProductVariantResponse updateVariant(Long variantId, CreateProductVariantRequest request);
 
-    ProductVariantResponse updateProductVariant(Long id,
-                                                CreateProductVariantRequest request);
-
-    void deleteProductVariant(Long id);
-
+    void deleteVariant(Long variantId);
 }

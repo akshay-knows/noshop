@@ -18,46 +18,56 @@ public class ProductVariantController {
 
     private final ProductVariantService productVariantService;
 
-    @PostMapping
-    public ResponseEntity<ProductVariantResponse> createProductVariant(
+    @PostMapping("/product/{productId}")
+    public ResponseEntity<ProductVariantResponse> createVariant(
+            @PathVariable Long productId,
             @Valid @RequestBody CreateProductVariantRequest request) {
 
-        return ResponseEntity.status(HttpStatus.CREATED)
-                             .body(productVariantService.createProductVariant(request));
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(productVariantService.createVariant(
+                        productId,
+                        request
+                ));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductVariantResponse> getProductVariantById(
-            @PathVariable Long id) {
+    @GetMapping("/product/{productId}")
+    public ResponseEntity<List<ProductVariantResponse>> getVariantsByProductId(
+            @PathVariable Long productId) {
 
         return ResponseEntity.ok(
-                productVariantService.getProductVariantById(id)
+                productVariantService.getVariantsByProductId(productId)
         );
     }
 
-    @GetMapping
-    public ResponseEntity<List<ProductVariantResponse>> getAllProductVariants() {
+    @GetMapping("/{variantId}")
+    public ResponseEntity<ProductVariantResponse> getVariantById(
+            @PathVariable Long variantId) {
 
         return ResponseEntity.ok(
-                productVariantService.getAllProductVariants()
+                productVariantService.getVariantById(variantId)
         );
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductVariantResponse> updateProductVariant(
-            @PathVariable Long id,
+    @PutMapping("/{variantId}")
+    public ResponseEntity<ProductVariantResponse> updateVariant(
+            @PathVariable Long variantId,
             @Valid @RequestBody CreateProductVariantRequest request) {
 
         return ResponseEntity.ok(
-                productVariantService.updateProductVariant(id, request)
+                productVariantService.updateVariant(
+                        variantId,
+                        request
+                )
         );
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProductVariant(
-            @PathVariable Long id) {
+    @DeleteMapping("/{variantId}")
+    public ResponseEntity<Void> deleteVariant(
+            @PathVariable Long variantId) {
 
-        productVariantService.deleteProductVariant(id);
+        productVariantService.deleteVariant(variantId);
+
         return ResponseEntity.noContent().build();
     }
 }
