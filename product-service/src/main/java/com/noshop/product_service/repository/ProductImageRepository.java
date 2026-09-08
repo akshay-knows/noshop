@@ -13,6 +13,10 @@ public interface ProductImageRepository
             Long productId
     );
 
+    List<ProductImage> findByProductIdInOrderByDisplayOrderAsc(
+            List<Long> productIds
+    );
+
     Optional<ProductImage> findByProductIdAndDisplayOrder(
             Long productId,
             Integer displayOrder
