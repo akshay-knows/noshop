@@ -7,6 +7,7 @@ import com.noshop.inventory_service.entity.Warehouse;
 import com.noshop.inventory_service.exception.DuplicateInventoryException;
 import com.noshop.inventory_service.exception.InactiveWarehouseException;
 import com.noshop.inventory_service.exception.InsufficientStockException;
+import com.noshop.inventory_service.exception.InvalidInventoryOperationException;
 import com.noshop.inventory_service.exception.InventoryNotFoundException;
 import com.noshop.inventory_service.exception.WarehouseNotFoundException;
 import com.noshop.inventory_service.repository.InventoryRepository;
@@ -68,10 +69,7 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public InventoryResponse getInventory(
-            Long variantId,
-            Long warehouseId
-    ) {
+    public InventoryResponse getInventory(Long variantId, Long warehouseId) {
 
         Inventory inventory = inventoryRepository
                 .findByVariantIdAndWarehouseId(variantId, warehouseId)
@@ -89,29 +87,18 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
-    public void addStock(
-            Long variantId,
-            Long warehouseId,
-            Integer quantity
-    ) {
+    public void addStock(Long variantId, Long warehouseId, Integer quantity) {
         validateQuantity(quantity);
 
         Inventory inventory = findInventory(variantId, warehouseId);
 
-        inventory.setQuantity(
-                inventory.getQuantity() + quantity
-        );
-
+        inventory.setQuantity(inventory.getQuantity() + quantity);
         inventoryRepository.save(inventory);
     }
 
     @Override
     @Transactional
-    public void reduceStock(
-            Long variantId,
-            Long warehouseId,
-            Integer quantity
-    ) {
+    public void reduceStock(Long variantId, Long warehouseId, Integer quantity) {
         validateQuantity(quantity);
 
         Inventory inventory = findInventory(variantId, warehouseId);
@@ -125,20 +112,13 @@ public class InventoryServiceImpl implements InventoryService {
             );
         }
 
-        inventory.setQuantity(
-                inventory.getQuantity() - quantity
-        );
-
+        inventory.setQuantity(inventory.getQuantity() - quantity);
         inventoryRepository.save(inventory);
     }
 
     @Override
     @Transactional
-    public void reserveStock(
-            Long variantId,
-            Long warehouseId,
-            Integer quantity
-    ) {
+    public void reserveStock(Long variantId, Long warehouseId, Integer quantity) {
         validateQuantity(quantity);
 
         Inventory inventory = findInventory(variantId, warehouseId);
@@ -158,17 +138,13 @@ public class InventoryServiceImpl implements InventoryService {
 
     @Override
     @Transactional
-    public void releaseStock(
-            Long variantId,
-            Long warehouseId,
-            Integer quantity
-    ) {
+    public void releaseStock(Long variantId, Long warehouseId, Integer quantity) {
         validateQuantity(quantity);
 
         Inventory inventory = findInventory(variantId, warehouseId);
 
         if (inventory.getReservedQuantity() < quantity) {
-            throw new IllegalStateException(
+            throw new InvalidInventoryOperationException(
                     "Cannot release more stock than reserved"
             );
         }
@@ -180,15 +156,9 @@ public class InventoryServiceImpl implements InventoryService {
         inventoryRepository.save(inventory);
     }
 
-    private Inventory findInventory(
-            Long variantId,
-            Long warehouseId
-    ) {
+    private Inventory findInventory(Long variantId, Long warehouseId) {
         return inventoryRepository
-                .findByVariantIdAndWarehouseId(
-                        variantId,
-                        warehouseId
-                )
+                .findByVariantIdAndWarehouseId(variantId, warehouseId)
                 .orElseThrow(() ->
                         new InventoryNotFoundException(
                                 "Inventory not found for variant "
@@ -210,7 +180,6 @@ public class InventoryServiceImpl implements InventoryService {
     private InventoryResponse toResponse(Inventory inventory) {
 
         int availableQuantity = inventory.getAvailableQuantity();
-
         String status;
 
         if (availableQuantity == 0) {
