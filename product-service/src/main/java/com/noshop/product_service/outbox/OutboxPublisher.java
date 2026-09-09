@@ -1,12 +1,12 @@
 package com.noshop.product_service.outbox;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
@@ -16,15 +16,14 @@ public class OutboxPublisher {
 
     private final OutboxEventRepository outboxEventRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
-    private final ObjectMapper objectMapper;
 
     @Scheduled(fixedDelay = 5000)
     public void publishPendingEvents() {
 
         List<OutboxEvent> events =
                 outboxEventRepository
-                        .findTop100ByStatusOrderByCreatedAtAsc(
-                                OutboxStatus.PENDING
+                        .findTop100ByStatusInOrderByCreatedAtAsc(
+                                List.of(OutboxStatus.PENDING, OutboxStatus.FAILED)
                         );
 
         for (OutboxEvent event : events) {
@@ -42,8 +41,7 @@ public class OutboxPublisher {
             ).get();
 
             event.setStatus(OutboxStatus.PUBLISHED);
-            event.setPublishedAt(java.time.LocalDateTime.now());
-
+            event.setPublishedAt(LocalDateTime.now());
             outboxEventRepository.save(event);
 
             log.info(
@@ -53,23 +51,28 @@ public class OutboxPublisher {
                     event.getAggregateId()
             );
 
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            markFailed(event, e);
         } catch (Exception e) {
-
-            event.setStatus(OutboxStatus.FAILED);
-            outboxEventRepository.save(event);
-
-            log.error(
-                    "Failed to publish outbox event. id={}, type={}, aggregateId={}",
-                    event.getId(),
-                    event.getEventType(),
-                    event.getAggregateId(),
-                    e
-            );
+            markFailed(event, e);
         }
     }
 
-    private String getTopic(String eventType) {
+    private void markFailed(OutboxEvent event, Exception e) {
+        event.setStatus(OutboxStatus.FAILED);
+        outboxEventRepository.save(event);
 
+        log.error(
+                "Failed to publish outbox event. id={}, type={}, aggregateId={}",
+                event.getId(),
+                event.getEventType(),
+                event.getAggregateId(),
+                e
+        );
+    }
+
+    private String getTopic(String eventType) {
         return switch (eventType) {
             case "PRODUCT_CREATED" -> "product-created";
             default -> throw new IllegalArgumentException(
