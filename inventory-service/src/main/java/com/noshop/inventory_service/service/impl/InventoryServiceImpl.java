@@ -4,6 +4,11 @@ import com.noshop.inventory_service.dto.request.InventoryRequest;
 import com.noshop.inventory_service.dto.response.InventoryResponse;
 import com.noshop.inventory_service.entity.Inventory;
 import com.noshop.inventory_service.entity.Warehouse;
+import com.noshop.inventory_service.exception.DuplicateInventoryException;
+import com.noshop.inventory_service.exception.InactiveWarehouseException;
+import com.noshop.inventory_service.exception.InsufficientStockException;
+import com.noshop.inventory_service.exception.InventoryNotFoundException;
+import com.noshop.inventory_service.exception.WarehouseNotFoundException;
 import com.noshop.inventory_service.repository.InventoryRepository;
 import com.noshop.inventory_service.repository.WarehouseRepository;
 import com.noshop.inventory_service.service.InventoryService;
@@ -25,14 +30,14 @@ public class InventoryServiceImpl implements InventoryService {
     public InventoryResponse createInventory(InventoryRequest request) {
 
         Warehouse warehouse = warehouseRepository.findById(request.getWarehouseId())
-                                                 .orElseThrow(() ->
-                                                                      new IllegalArgumentException(
-                                                                              "Warehouse not found: " + request.getWarehouseId()
-                                                                      )
-                                                 );
+                .orElseThrow(() ->
+                        new WarehouseNotFoundException(
+                                "Warehouse not found: " + request.getWarehouseId()
+                        )
+                );
 
         if (!warehouse.getActive()) {
-            throw new IllegalStateException(
+            throw new InactiveWarehouseException(
                     "Warehouse is inactive: " + warehouse.getCode()
             );
         }
@@ -43,7 +48,7 @@ public class InventoryServiceImpl implements InventoryService {
                         request.getWarehouseId()
                 )
                 .ifPresent(existing -> {
-                    throw new IllegalStateException(
+                    throw new DuplicateInventoryException(
                             "Inventory already exists for variant "
                                     + request.getVariantId()
                                     + " in warehouse "
@@ -52,11 +57,11 @@ public class InventoryServiceImpl implements InventoryService {
                 });
 
         Inventory inventory = Inventory.builder()
-                                       .variantId(request.getVariantId())
-                                       .warehouseId(request.getWarehouseId())
-                                       .quantity(request.getQuantity())
-                                       .reservedQuantity(0)
-                                       .build();
+                .variantId(request.getVariantId())
+                .warehouseId(request.getWarehouseId())
+                .quantity(request.getQuantity())
+                .reservedQuantity(0)
+                .build();
 
         return toResponse(inventoryRepository.save(inventory));
     }
@@ -71,40 +76,17 @@ public class InventoryServiceImpl implements InventoryService {
         Inventory inventory = inventoryRepository
                 .findByVariantIdAndWarehouseId(variantId, warehouseId)
                 .orElseThrow(() ->
-                                     new IllegalArgumentException(
-                                             "Inventory not found for variant "
-                                                     + variantId
-                                                     + " and warehouse "
-                                                     + warehouseId
-                                     )
+                        new InventoryNotFoundException(
+                                "Inventory not found for variant "
+                                        + variantId
+                                        + " and warehouse "
+                                        + warehouseId
+                        )
                 );
 
         return toResponse(inventory);
     }
 
-    private InventoryResponse toResponse(Inventory inventory) {
-
-        int availableQuantity = inventory.getAvailableQuantity();
-
-        String status;
-
-        if (availableQuantity == 0) {
-            status = "OUT_OF_STOCK";
-        } else if (availableQuantity <= LOW_STOCK_THRESHOLD) {
-            status = "LOW_STOCK";
-        } else {
-            status = "IN_STOCK";
-        }
-
-        return InventoryResponse.builder()
-                                .variantId(inventory.getVariantId())
-                                .warehouseId(inventory.getWarehouseId())
-                                .quantity(inventory.getQuantity())
-                                .reservedQuantity(inventory.getReservedQuantity())
-                                .availableQuantity(availableQuantity)
-                                .status(status)
-                                .build();
-    }
     @Override
     @Transactional
     public void addStock(
@@ -135,7 +117,7 @@ public class InventoryServiceImpl implements InventoryService {
         Inventory inventory = findInventory(variantId, warehouseId);
 
         if (inventory.getAvailableQuantity() < quantity) {
-            throw new IllegalStateException(
+            throw new InsufficientStockException(
                     "Insufficient available stock for variant "
                             + variantId
                             + " in warehouse "
@@ -162,7 +144,7 @@ public class InventoryServiceImpl implements InventoryService {
         Inventory inventory = findInventory(variantId, warehouseId);
 
         if (inventory.getAvailableQuantity() < quantity) {
-            throw new IllegalStateException(
+            throw new InsufficientStockException(
                     "Insufficient available stock for reservation"
             );
         }
@@ -197,6 +179,7 @@ public class InventoryServiceImpl implements InventoryService {
 
         inventoryRepository.save(inventory);
     }
+
     private Inventory findInventory(
             Long variantId,
             Long warehouseId
@@ -207,12 +190,12 @@ public class InventoryServiceImpl implements InventoryService {
                         warehouseId
                 )
                 .orElseThrow(() ->
-                                     new IllegalArgumentException(
-                                             "Inventory not found for variant "
-                                                     + variantId
-                                                     + " and warehouse "
-                                                     + warehouseId
-                                     )
+                        new InventoryNotFoundException(
+                                "Inventory not found for variant "
+                                        + variantId
+                                        + " and warehouse "
+                                        + warehouseId
+                        )
                 );
     }
 
@@ -222,5 +205,29 @@ public class InventoryServiceImpl implements InventoryService {
                     "Quantity must be greater than zero"
             );
         }
+    }
+
+    private InventoryResponse toResponse(Inventory inventory) {
+
+        int availableQuantity = inventory.getAvailableQuantity();
+
+        String status;
+
+        if (availableQuantity == 0) {
+            status = "OUT_OF_STOCK";
+        } else if (availableQuantity <= LOW_STOCK_THRESHOLD) {
+            status = "LOW_STOCK";
+        } else {
+            status = "IN_STOCK";
+        }
+
+        return InventoryResponse.builder()
+                .variantId(inventory.getVariantId())
+                .warehouseId(inventory.getWarehouseId())
+                .quantity(inventory.getQuantity())
+                .reservedQuantity(inventory.getReservedQuantity())
+                .availableQuantity(availableQuantity)
+                .status(status)
+                .build();
     }
 }
