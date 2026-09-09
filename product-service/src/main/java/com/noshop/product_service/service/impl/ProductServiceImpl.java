@@ -18,6 +18,8 @@ import com.noshop.product_service.repository.SubCategoryRepository;
 import com.noshop.product_service.service.ProductService;
 import com.noshop.product_service.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -108,7 +110,8 @@ public class ProductServiceImpl implements ProductService {
                     pageable
             );
 
-        } else if (subCategoryId != null && status != null) {
+        }
+        else if (subCategoryId != null && status != null) {
 
             products = productRepository.findBySubCategoryIdAndStatus(
                     subCategoryId,
@@ -116,28 +119,32 @@ public class ProductServiceImpl implements ProductService {
                     pageable
             );
 
-        } else if (categoryId != null) {
+        }
+        else if (categoryId != null) {
 
             products = productRepository.findByCategoryId(
                     categoryId,
                     pageable
             );
 
-        } else if (subCategoryId != null) {
+        }
+        else if (subCategoryId != null) {
 
             products = productRepository.findBySubCategoryId(
                     subCategoryId,
                     pageable
             );
 
-        } else if (status != null) {
+        }
+        else if (status != null) {
 
             products = productRepository.findByStatus(
                     status,
                     pageable
             );
 
-        } else {
+        }
+        else {
 
             products = productRepository.findAll(pageable);
         }
@@ -145,7 +152,7 @@ public class ProductServiceImpl implements ProductService {
         return mapProductsWithImages(products);
     }
 
-
+    @Cacheable(value = "products", key = "#id")
     @Override
     public ProductResponse getProductById(Long id) {
 
@@ -159,7 +166,7 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toResponse(product);
     }
 
-
+    @CacheEvict(value = "products", key = "#id")
     @Override
     public ProductResponse updateProduct(
             Long id,
@@ -216,7 +223,7 @@ public class ProductServiceImpl implements ProductService {
         return productMapper.toResponse(updatedProduct);
     }
 
-
+    @CacheEvict(value = "products", key = "#id")
     @Override
     public void deleteProduct(Long id) {
 
@@ -289,7 +296,8 @@ public class ProductServiceImpl implements ProductService {
                         .findByProductIdInOrderByDisplayOrderAsc(productIds)
                         .stream()
                         .collect(Collectors.groupingBy(
-                                image -> image.getProduct().getId()
+                                image -> image.getProduct()
+                                              .getId()
                         ));
 
         return products.map(product -> {
