@@ -1,12 +1,8 @@
 ${AnsiColor.BRIGHT_MAGENTA}
-    ███╗   ██╗ ██████╗ ███████╗██╗  ██╗ ██████╗ ██████╗
-    ████╗  ██║██╔═══██╗██╔════╝██║  ██║██╔═══██╗██╔══██╗
-    ██╔██╗ ██║██║   ██║███████╗███████║██║   ██║██████╔╝
-    ██║╚██╗██║██║   ██║╚════██║██╔══██║██║   ██║██╔═══╝
-    ██║ ╚████║╚██████╔╝███████║██║  ██║╚██████╔╝██║
-    ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝
+    ╔══════════════════════════════════════╗
+    ║             ADMIN SERVER              ║
+    ╚══════════════════════════════════════╝
 ${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}NoShop${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_YELLOW}Admin Server${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
-${AnsiColor.BRIGHT_MAGENTA}    :: Platform${AnsiColor.BRIGHT_WHITE}      :: Service Monitoring
+    :: ${AnsiColor.BRIGHT_WHITE}Admin Server${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_YELLOW}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
+${AnsiColor.BRIGHT_MAGENTA}    :: Platform${AnsiColor.BRIGHT_WHITE} :: Service Monitoring
 ${AnsiColor.DEFAULT}
