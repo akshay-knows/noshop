@@ -92,6 +92,7 @@ public class CategoryServiceImpl implements CategoryService {
                         "Category not found with id: " + id
                 ));
 
-        categoryRepository.delete(category);
+        category.setActive(false);
+        categoryRepository.save(category);
     }
 }
