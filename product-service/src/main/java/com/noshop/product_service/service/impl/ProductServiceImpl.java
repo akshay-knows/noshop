@@ -122,13 +122,9 @@ public class ProductServiceImpl implements ProductService {
         Page<Product> products;
 
         if (categoryId != null && status != null) {
-            products = productRepository.findByCategoryIdAndStatus(
-                    categoryId, status, pageable
-            );
+            products = productRepository.findByCategoryIdAndStatus(categoryId, status, pageable);
         } else if (subCategoryId != null && status != null) {
-            products = productRepository.findBySubCategoryIdAndStatus(
-                    subCategoryId, status, pageable
-            );
+            products = productRepository.findBySubCategoryIdAndStatus(subCategoryId, status, pageable);
         } else if (categoryId != null) {
             products = productRepository.findByCategoryId(categoryId, pageable);
         } else if (subCategoryId != null) {
@@ -156,9 +152,7 @@ public class ProductServiceImpl implements ProductService {
 
     @CacheEvict(value = "products", key = "#id")
     @Override
-    public ProductResponse updateProduct(
-            Long id,
-            CreateProductRequest request) {
+    public ProductResponse updateProduct(Long id, CreateProductRequest request) {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -213,26 +207,19 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public Page<ProductResponse> searchProducts(
-            String query,
-            Pageable pageable) {
+    public Page<ProductResponse> searchProducts(String query, Pageable pageable) {
 
         if (query == null || query.isBlank()) {
             throw new IllegalArgumentException("Search query must not be blank");
         }
 
-        Page<Product> products = productRepository.searchProducts(
-                query.trim(), pageable
-        );
-
+        Page<Product> products = productRepository.searchProducts(query.trim(), pageable);
         return mapProductsWithImages(products);
     }
 
     @CacheEvict(value = "products", key = "#id")
     @Override
-    public ProductResponse updateProductStatus(
-            Long id,
-            ProductStatus status) {
+    public ProductResponse updateProductStatus(Long id, ProductStatus status) {
 
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -243,7 +230,8 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Product status is required");
         }
 
-        if (product.getStatus() == ProductStatus.DISCONTINUED) {
+        if (product.getStatus() == ProductStatus.DISCONTINUED
+                && status != ProductStatus.DISCONTINUED) {
             throw new IllegalStateException(
                     "Discontinued product cannot be reactivated"
             );
@@ -266,13 +254,10 @@ public class ProductServiceImpl implements ProductService {
             return products.map(productMapper::toResponse);
         }
 
-        Map<Long, List<ProductImage>> imagesByProductId =
-                productImageRepository
-                        .findByProductIdInOrderByDisplayOrderAsc(productIds)
-                        .stream()
-                        .collect(Collectors.groupingBy(
-                                image -> image.getProduct().getId()
-                        ));
+        Map<Long, List<ProductImage>> imagesByProductId = productImageRepository
+                .findByProductIdInOrderByDisplayOrderAsc(productIds)
+                .stream()
+                .collect(Collectors.groupingBy(image -> image.getProduct().getId()));
 
         return products.map(product -> {
             ProductResponse response = productMapper.toResponse(product);
