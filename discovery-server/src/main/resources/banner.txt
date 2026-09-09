@@ -1,8 +1,29 @@
-${AnsiColor.BRIGHT_BLUE}
-    ╔══════════════════════════════════════╗
-    ║           DISCOVERY SERVER            ║
-    ╚══════════════════════════════════════╝
 ${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}Discovery Server${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_BLUE}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
-${AnsiColor.BRIGHT_BLUE}    :: Platform${AnsiColor.BRIGHT_WHITE} :: Eureka Service Discovery
+  ┌─────────────────────────────────────────────────────────────┐
+  │ ${AnsiColor.BRIGHT_GREEN}◈ ◈ ◈  N E T W O R K   N O D E   O N L I N E  ◈ ◈ ◈${AnsiColor.BRIGHT_CYAN}        │
+  └─────────────────────────────────────────────────────────────┘
+
+  ${AnsiColor.BRIGHT_RED}████  ${AnsiColor.BRIGHT_YELLOW}█████ ${AnsiColor.BRIGHT_GREEN}█████ ${AnsiColor.BRIGHT_CYAN}█████ ${AnsiColor.BRIGHT_BLUE}█████ ${AnsiColor.BRIGHT_MAGENTA}█   █ ${AnsiColor.BRIGHT_RED}█████ ${AnsiColor.BRIGHT_YELLOW}████  ${AnsiColor.BRIGHT_GREEN}█   █
+  ${AnsiColor.BRIGHT_RED}█   █ ${AnsiColor.BRIGHT_YELLOW}  █   ${AnsiColor.BRIGHT_GREEN}█     ${AnsiColor.BRIGHT_CYAN}█     ${AnsiColor.BRIGHT_BLUE}█   █ ${AnsiColor.BRIGHT_MAGENTA}█   █ ${AnsiColor.BRIGHT_RED}█     ${AnsiColor.BRIGHT_YELLOW}█   █ ${AnsiColor.BRIGHT_GREEN} █ █
+  ${AnsiColor.BRIGHT_RED}█   █ ${AnsiColor.BRIGHT_YELLOW}  █   ${AnsiColor.BRIGHT_GREEN}█████ ${AnsiColor.BRIGHT_CYAN}█     ${AnsiColor.BRIGHT_BLUE}█   █ ${AnsiColor.BRIGHT_MAGENTA}█   █ ${AnsiColor.BRIGHT_RED}████  ${AnsiColor.BRIGHT_YELLOW}████  ${AnsiColor.BRIGHT_GREEN}  █
+  ${AnsiColor.BRIGHT_RED}█   █ ${AnsiColor.BRIGHT_YELLOW}  █   ${AnsiColor.BRIGHT_GREEN}    █ ${AnsiColor.BRIGHT_CYAN}█     ${AnsiColor.BRIGHT_BLUE}█   █ ${AnsiColor.BRIGHT_MAGENTA} █ █  ${AnsiColor.BRIGHT_RED}█     ${AnsiColor.BRIGHT_YELLOW}█  █  ${AnsiColor.BRIGHT_GREEN}  █
+  ${AnsiColor.BRIGHT_RED}████  ${AnsiColor.BRIGHT_YELLOW}█████ ${AnsiColor.BRIGHT_GREEN}█████ ${AnsiColor.BRIGHT_CYAN}█████ ${AnsiColor.BRIGHT_BLUE}█████ ${AnsiColor.BRIGHT_MAGENTA}  █   ${AnsiColor.BRIGHT_RED}█████ ${AnsiColor.BRIGHT_YELLOW}█   █ ${AnsiColor.BRIGHT_GREEN}  █
+
+  ${AnsiColor.BRIGHT_RED}█████ ${AnsiColor.BRIGHT_YELLOW}█████ ${AnsiColor.BRIGHT_GREEN}████  ${AnsiColor.BRIGHT_CYAN}█   █ ${AnsiColor.BRIGHT_BLUE}█████ ${AnsiColor.BRIGHT_MAGENTA}████
+  ${AnsiColor.BRIGHT_RED}█     ${AnsiColor.BRIGHT_YELLOW}█     ${AnsiColor.BRIGHT_GREEN}█   █ ${AnsiColor.BRIGHT_CYAN}█   █ ${AnsiColor.BRIGHT_BLUE}█     ${AnsiColor.BRIGHT_MAGENTA}█   █
+  ${AnsiColor.BRIGHT_RED}█████ ${AnsiColor.BRIGHT_YELLOW}████  ${AnsiColor.BRIGHT_GREEN}████  ${AnsiColor.BRIGHT_CYAN}█   █ ${AnsiColor.BRIGHT_BLUE}████  ${AnsiColor.BRIGHT_MAGENTA}████
+  ${AnsiColor.BRIGHT_RED}    █ ${AnsiColor.BRIGHT_YELLOW}█     ${AnsiColor.BRIGHT_GREEN}█  █  ${AnsiColor.BRIGHT_CYAN} █ █  ${AnsiColor.BRIGHT_BLUE}█     ${AnsiColor.BRIGHT_MAGENTA}█  █
+  ${AnsiColor.BRIGHT_RED}█████ ${AnsiColor.BRIGHT_YELLOW}█████ ${AnsiColor.BRIGHT_GREEN}█   █ ${AnsiColor.BRIGHT_CYAN}  █   ${AnsiColor.BRIGHT_BLUE}█████ ${AnsiColor.BRIGHT_MAGENTA}█   █
+
+${AnsiColor.BRIGHT_CYAN}  ┌─────────────────────────────────────────────────────────────┐
+  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_MAGENTA}PROJECT   ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_YELLOW}NOSHOP  ${AnsiColor.DEFAULT}${AnsiColor.BRIGHT_WHITE}[microservices e-commerce]        ${AnsiColor.BRIGHT_CYAN}│
+  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_MAGENTA}ENGINEER  ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_GREEN}akshay-knows                              ${AnsiColor.BRIGHT_CYAN}│
+  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_MAGENTA}ROLE      ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_BLUE}Eureka Service Registry                   ${AnsiColor.BRIGHT_CYAN}│
+  └─────────────────────────────────────────────────────────────┘
+${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_WHITE}   ${application.title}${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_GREEN}v${application.version}
+${AnsiColor.BRIGHT_BLUE}   Powered by Spring Boot ${AnsiColor.BRIGHT_WHITE}${spring-boot.version}
+${AnsiColor.DEFAULT}
+   ${AnsiColor.BRIGHT_CYAN}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_WHITE}Discovery Server${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_CYAN}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_BLUE}Spring Boot ${AnsiColor.BRIGHT_GREEN}v${spring-boot.version}${AnsiColor.DEFAULT}
+   ${AnsiColor.BRIGHT_CYAN}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_MAGENTA}Platform        ${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_CYAN}::${AnsiColor.DEFAULT} Eureka Service Discovery
 ${AnsiColor.DEFAULT}
