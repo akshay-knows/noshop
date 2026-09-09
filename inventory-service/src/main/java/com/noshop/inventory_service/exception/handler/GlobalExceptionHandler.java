@@ -16,11 +16,7 @@ public class GlobalExceptionHandler {
             InventoryNotFoundException ex,
             HttpServletRequest request
     ) {
-        return buildError(
-                HttpStatus.NOT_FOUND,
-                ex.getMessage(),
-                request.getRequestURI()
-        );
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(WarehouseNotFoundException.class)
@@ -29,29 +25,22 @@ public class GlobalExceptionHandler {
             WarehouseNotFoundException ex,
             HttpServletRequest request
     ) {
-        return buildError(
-                HttpStatus.NOT_FOUND,
-                ex.getMessage(),
-                request.getRequestURI()
-        );
+        return buildError(HttpStatus.NOT_FOUND, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler({
             DuplicateInventoryException.class,
             DuplicateWarehouseException.class,
             InsufficientStockException.class,
-            InactiveWarehouseException.class
+            InactiveWarehouseException.class,
+            InvalidInventoryOperationException.class
     })
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleConflict(
             RuntimeException ex,
             HttpServletRequest request
     ) {
-        return buildError(
-                HttpStatus.CONFLICT,
-                ex.getMessage(),
-                request.getRequestURI()
-        );
+        return buildError(HttpStatus.CONFLICT, ex.getMessage(), request.getRequestURI());
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
@@ -60,11 +49,7 @@ public class GlobalExceptionHandler {
             IllegalArgumentException ex,
             HttpServletRequest request
     ) {
-        return buildError(
-                HttpStatus.BAD_REQUEST,
-                ex.getMessage(),
-                request.getRequestURI()
-        );
+        return buildError(HttpStatus.BAD_REQUEST, ex.getMessage(), request.getRequestURI());
     }
 
     private ErrorResponse buildError(
