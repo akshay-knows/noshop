@@ -25,29 +25,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             LEFT JOIN FETCH p.subCategory
             WHERE p.id = :id
             """)
-    Optional<Product> findByIdWithImages(
-            @Param("id") Long id
-    );
+    Optional<Product> findByIdWithImages(@Param("id") Long id);
 
-    boolean existsBySlugAndIdNot(
-            String slug,
-            Long id
-    );
+    boolean existsBySlugAndIdNot(String slug, Long id);
 
-    Page<Product> findByCategoryId(
+    Page<Product> findByCategoryId(Long categoryId, Pageable pageable);
+
+    Page<Product> findBySubCategoryId(Long subCategoryId, Pageable pageable);
+
+    Page<Product> findByCategoryIdAndSubCategoryId(
             Long categoryId,
-            Pageable pageable
-    );
-
-    Page<Product> findBySubCategoryId(
             Long subCategoryId,
             Pageable pageable
     );
 
-    Page<Product> findByStatus(
-            ProductStatus status,
-            Pageable pageable
-    );
+    Page<Product> findByStatus(ProductStatus status, Pageable pageable);
 
     Page<Product> findByCategoryIdAndStatus(
             Long categoryId,
@@ -56,6 +48,13 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     );
 
     Page<Product> findBySubCategoryIdAndStatus(
+            Long subCategoryId,
+            ProductStatus status,
+            Pageable pageable
+    );
+
+    Page<Product> findByCategoryIdAndSubCategoryIdAndStatus(
+            Long categoryId,
             Long subCategoryId,
             ProductStatus status,
             Pageable pageable
