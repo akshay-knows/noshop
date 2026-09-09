@@ -1,8 +1,25 @@
 ${AnsiColor.BRIGHT_CYAN}
-    ╔══════════════════════════════════════╗
-    ║              API GATEWAY              ║
-    ╚══════════════════════════════════════╝
-${AnsiColor.BRIGHT_MAGENTA}
-    :: ${AnsiColor.BRIGHT_WHITE}API Gateway${AnsiColor.BRIGHT_MAGENTA} :: ${AnsiColor.BRIGHT_YELLOW}Spring Boot${AnsiColor.BRIGHT_MAGENTA} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
-${AnsiColor.BRIGHT_CYAN}    :: Platform${AnsiColor.BRIGHT_WHITE} :: Gateway & Routing
+  ┌─────────────────────────────────────────────────────────────────┐
+  ${AnsiColor.BRIGHT_CYAN}    ◈   ╔═══════╗        ╔═══════╗   ◈
+  ${AnsiColor.BRIGHT_BLUE}        ║ ROUTE ║  ──>  ║ ROUTE ║
+  ${AnsiColor.BRIGHT_CYAN}    ◈   ╚═══════╝        ╚═══════╝   ◈
+  └─────────────────────────────────────────────────────────────────┘
+
+  ${AnsiColor.BRIGHT_CYAN} ████ ${AnsiColor.BRIGHT_BLUE} ███  ${AnsiColor.BRIGHT_CYAN}█████ ${AnsiColor.BRIGHT_BLUE}█████ ${AnsiColor.BRIGHT_CYAN}█   █ ${AnsiColor.BRIGHT_BLUE} ███  ${AnsiColor.BRIGHT_CYAN}█   █
+  ${AnsiColor.BRIGHT_CYAN}█     ${AnsiColor.BRIGHT_BLUE}█   █ ${AnsiColor.BRIGHT_CYAN}  █   ${AnsiColor.BRIGHT_BLUE}█     ${AnsiColor.BRIGHT_CYAN}█   █ ${AnsiColor.BRIGHT_BLUE}█   █ ${AnsiColor.BRIGHT_CYAN} █ █
+  ${AnsiColor.BRIGHT_CYAN}█ ███ ${AnsiColor.BRIGHT_BLUE}█████ ${AnsiColor.BRIGHT_CYAN}  █   ${AnsiColor.BRIGHT_BLUE}████  ${AnsiColor.BRIGHT_CYAN}█ █ █ ${AnsiColor.BRIGHT_BLUE}█████ ${AnsiColor.BRIGHT_CYAN}  █
+  ${AnsiColor.BRIGHT_CYAN}█   █ ${AnsiColor.BRIGHT_BLUE}█   █ ${AnsiColor.BRIGHT_CYAN}  █   ${AnsiColor.BRIGHT_BLUE}█     ${AnsiColor.BRIGHT_CYAN}██ ██ ${AnsiColor.BRIGHT_BLUE}█   █ ${AnsiColor.BRIGHT_CYAN}  █
+  ${AnsiColor.BRIGHT_CYAN} ████ ${AnsiColor.BRIGHT_BLUE}█   █ ${AnsiColor.BRIGHT_CYAN}  █   ${AnsiColor.BRIGHT_BLUE}█████ ${AnsiColor.BRIGHT_CYAN}█   █ ${AnsiColor.BRIGHT_BLUE}█   █ ${AnsiColor.BRIGHT_CYAN}  █
+
+${AnsiColor.BRIGHT_CYAN}  ┌─────────────────────────────────────────────────────────────────┐
+${AnsiColor.BRIGHT_CYAN}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}SERVICE   ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_CYAN}api-gateway                                     ${AnsiColor.BRIGHT_CYAN}│
+${AnsiColor.BRIGHT_CYAN}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}ROLE      ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_BLUE}Single entry point / request routing            ${AnsiColor.BRIGHT_CYAN}│
+${AnsiColor.BRIGHT_CYAN}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}PROJECT   ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_GREEN}noshop                                          ${AnsiColor.BRIGHT_CYAN}│
+${AnsiColor.BRIGHT_CYAN}  └─────────────────────────────────────────────────────────────────┘
+${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_WHITE}   ${application.title}${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_GREEN}v${application.version}
+${AnsiColor.BRIGHT_BLUE}   Powered by Spring Boot ${AnsiColor.BRIGHT_WHITE}${spring-boot.version}
+${AnsiColor.DEFAULT}
+   ${AnsiColor.BRIGHT_CYAN}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_WHITE}API Gateway${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_CYAN}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_BLUE}Spring Boot ${AnsiColor.BRIGHT_GREEN}v${spring-boot.version}${AnsiColor.DEFAULT}
+   ${AnsiColor.BRIGHT_CYAN}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_WHITE}Developer       ${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_CYAN}::${AnsiColor.DEFAULT} akshay-knows
 ${AnsiColor.DEFAULT}

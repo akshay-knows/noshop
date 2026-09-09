@@ -1,8 +1,25 @@
 ${AnsiColor.BRIGHT_MAGENTA}
-    ╔══════════════════════════════════════╗
-    ║             ADMIN SERVER              ║
-    ╚══════════════════════════════════════╝
-${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}Admin Server${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_YELLOW}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
-${AnsiColor.BRIGHT_MAGENTA}    :: Platform${AnsiColor.BRIGHT_WHITE} :: Service Monitoring
+  ┌─────────────────────────────────────────────────────────────────┐
+  ${AnsiColor.BRIGHT_MAGENTA}     ⚙  ┌──────────────────┐  ⚙
+  ${AnsiColor.BRIGHT_WHITE}        │  root@admin-console  │
+  ${AnsiColor.BRIGHT_MAGENTA}     ⚙  └──────────────────┘  ⚙
+  └─────────────────────────────────────────────────────────────────┘
+
+  ${AnsiColor.BRIGHT_MAGENTA} ███  ${AnsiColor.BRIGHT_WHITE}████  ${AnsiColor.BRIGHT_MAGENTA}█   █ ${AnsiColor.BRIGHT_WHITE}█████ ${AnsiColor.BRIGHT_MAGENTA}█   █
+  ${AnsiColor.BRIGHT_MAGENTA}█   █ ${AnsiColor.BRIGHT_WHITE}█   █ ${AnsiColor.BRIGHT_MAGENTA}██ ██ ${AnsiColor.BRIGHT_WHITE}  █   ${AnsiColor.BRIGHT_MAGENTA}██  █
+  ${AnsiColor.BRIGHT_MAGENTA}█████ ${AnsiColor.BRIGHT_WHITE}█   █ ${AnsiColor.BRIGHT_MAGENTA}█ █ █ ${AnsiColor.BRIGHT_WHITE}  █   ${AnsiColor.BRIGHT_MAGENTA}█ █ █
+  ${AnsiColor.BRIGHT_MAGENTA}█   █ ${AnsiColor.BRIGHT_WHITE}█   █ ${AnsiColor.BRIGHT_MAGENTA}█   █ ${AnsiColor.BRIGHT_WHITE}  █   ${AnsiColor.BRIGHT_MAGENTA}█  ██
+  ${AnsiColor.BRIGHT_MAGENTA}█   █ ${AnsiColor.BRIGHT_WHITE}████  ${AnsiColor.BRIGHT_MAGENTA}█   █ ${AnsiColor.BRIGHT_WHITE}█████ ${AnsiColor.BRIGHT_MAGENTA}█   █
+
+${AnsiColor.BRIGHT_MAGENTA}  ┌─────────────────────────────────────────────────────────────────┐
+${AnsiColor.BRIGHT_MAGENTA}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}SERVICE   ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_MAGENTA}adminservice                                    ${AnsiColor.BRIGHT_MAGENTA}│
+${AnsiColor.BRIGHT_MAGENTA}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}ROLE      ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_WHITE}Admin operations & platform control             ${AnsiColor.BRIGHT_MAGENTA}│
+${AnsiColor.BRIGHT_MAGENTA}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}PROJECT   ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_GREEN}noshop                                          ${AnsiColor.BRIGHT_MAGENTA}│
+${AnsiColor.BRIGHT_MAGENTA}  └─────────────────────────────────────────────────────────────────┘
+${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_WHITE}   ${application.title}${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_GREEN}v${application.version}
+${AnsiColor.BRIGHT_BLUE}   Powered by Spring Boot ${AnsiColor.BRIGHT_WHITE}${spring-boot.version}
+${AnsiColor.DEFAULT}
+   ${AnsiColor.BRIGHT_MAGENTA}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_WHITE}Admin Service${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_MAGENTA}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_BLUE}Spring Boot ${AnsiColor.BRIGHT_GREEN}v${spring-boot.version}${AnsiColor.DEFAULT}
+   ${AnsiColor.BRIGHT_MAGENTA}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_WHITE}Developer       ${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_MAGENTA}::${AnsiColor.DEFAULT} akshay-knows
 ${AnsiColor.DEFAULT}

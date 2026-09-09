@@ -1,8 +1,27 @@
-${AnsiColor.BRIGHT_YELLOW}
-    ╔══════════════════════════════════════╗
-    ║              AUTH SERVICE              ║
-    ╚══════════════════════════════════════╝
-${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}Auth Service${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_YELLOW}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
-${AnsiColor.BRIGHT_YELLOW}    :: Platform${AnsiColor.BRIGHT_WHITE} :: Authentication & JWT
+${AnsiColor.BRIGHT_RED}
+  ┌─────────────────────────────────────────────────────────────────┐
+  ${AnsiColor.BRIGHT_YELLOW}                     ▲
+  ${AnsiColor.BRIGHT_RED}                  ╱ █ ╱\
+  ${AnsiColor.BRIGHT_YELLOW}                 │ ⚿ │    S E C U R E D
+  ${AnsiColor.BRIGHT_RED}                  \ █ \╱
+  ${AnsiColor.BRIGHT_YELLOW}                     ▼
+  └─────────────────────────────────────────────────────────────────┘
+
+  ${AnsiColor.BRIGHT_RED} ███  ${AnsiColor.BRIGHT_YELLOW}█   █ ${AnsiColor.BRIGHT_RED}█████ ${AnsiColor.BRIGHT_YELLOW}█   █
+  ${AnsiColor.BRIGHT_RED}█   █ ${AnsiColor.BRIGHT_YELLOW}█   █ ${AnsiColor.BRIGHT_RED}  █   ${AnsiColor.BRIGHT_YELLOW}█   █
+  ${AnsiColor.BRIGHT_RED}█████ ${AnsiColor.BRIGHT_YELLOW}█   █ ${AnsiColor.BRIGHT_RED}  █   ${AnsiColor.BRIGHT_YELLOW}█████
+  ${AnsiColor.BRIGHT_RED}█   █ ${AnsiColor.BRIGHT_YELLOW}█   █ ${AnsiColor.BRIGHT_RED}  █   ${AnsiColor.BRIGHT_YELLOW}█   █
+  ${AnsiColor.BRIGHT_RED}█   █ ${AnsiColor.BRIGHT_YELLOW} ███  ${AnsiColor.BRIGHT_RED}  █   ${AnsiColor.BRIGHT_YELLOW}█   █
+
+${AnsiColor.BRIGHT_RED}  ┌─────────────────────────────────────────────────────────────────┐
+${AnsiColor.BRIGHT_RED}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}SERVICE   ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_RED}authservice                                     ${AnsiColor.BRIGHT_RED}│
+${AnsiColor.BRIGHT_RED}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}ROLE      ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_YELLOW}JWT auth / identity & access control            ${AnsiColor.BRIGHT_RED}│
+${AnsiColor.BRIGHT_RED}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}PROJECT   ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_GREEN}noshop                                          ${AnsiColor.BRIGHT_RED}│
+${AnsiColor.BRIGHT_RED}  └─────────────────────────────────────────────────────────────────┘
+${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_WHITE}   ${application.title}${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_GREEN}v${application.version}
+${AnsiColor.BRIGHT_BLUE}   Powered by Spring Boot ${AnsiColor.BRIGHT_WHITE}${spring-boot.version}
+${AnsiColor.DEFAULT}
+   ${AnsiColor.BRIGHT_RED}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_WHITE}Auth Service${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_BLUE}Spring Boot ${AnsiColor.BRIGHT_GREEN}v${spring-boot.version}${AnsiColor.DEFAULT}
+   ${AnsiColor.BRIGHT_RED}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_WHITE}Developer       ${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_RED}::${AnsiColor.DEFAULT} akshay-knows
 ${AnsiColor.DEFAULT}

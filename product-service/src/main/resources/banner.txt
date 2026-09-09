@@ -1,8 +1,25 @@
 ${AnsiColor.BRIGHT_GREEN}
-    ╔══════════════════════════════════════╗
-    ║            PRODUCT SERVICE             ║
-    ╚══════════════════════════════════════╝
-${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}Product Service${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_YELLOW}* ${spring-boot.version}
-${AnsiColor.BRIGHT_GREEN}    :: Platform${AnsiColor.BRIGHT_WHITE} :: Product Catalog
+  ┌─────────────────────────────────────────────────────────────────┐
+  ${AnsiColor.BRIGHT_GREEN}      ╔═══════╗
+  ${AnsiColor.BRIGHT_YELLOW}      ║ ██ █ ║   ${AnsiColor.BRIGHT_WHITE}||| |  ||| ||  |||   ${AnsiColor.BRIGHT_YELLOW}SKU:8891234
+  ${AnsiColor.BRIGHT_GREEN}      ╚═══════╝
+  └─────────────────────────────────────────────────────────────────┘
+
+  ${AnsiColor.BRIGHT_GREEN}████  ${AnsiColor.BRIGHT_YELLOW}████  ${AnsiColor.BRIGHT_GREEN}█████ ${AnsiColor.BRIGHT_YELLOW}████  ${AnsiColor.BRIGHT_GREEN}█   █ ${AnsiColor.BRIGHT_YELLOW}█████ ${AnsiColor.BRIGHT_GREEN}█████
+  ${AnsiColor.BRIGHT_GREEN}█   █ ${AnsiColor.BRIGHT_YELLOW}█   █ ${AnsiColor.BRIGHT_GREEN}█   █ ${AnsiColor.BRIGHT_YELLOW}█   █ ${AnsiColor.BRIGHT_GREEN}█   █ ${AnsiColor.BRIGHT_YELLOW}█     ${AnsiColor.BRIGHT_GREEN}  █
+  ${AnsiColor.BRIGHT_GREEN}████  ${AnsiColor.BRIGHT_YELLOW}████  ${AnsiColor.BRIGHT_GREEN}█   █ ${AnsiColor.BRIGHT_YELLOW}█   █ ${AnsiColor.BRIGHT_GREEN}█   █ ${AnsiColor.BRIGHT_YELLOW}█     ${AnsiColor.BRIGHT_GREEN}  █
+  ${AnsiColor.BRIGHT_GREEN}█     ${AnsiColor.BRIGHT_YELLOW}█  █  ${AnsiColor.BRIGHT_GREEN}█   █ ${AnsiColor.BRIGHT_YELLOW}█   █ ${AnsiColor.BRIGHT_GREEN}█   █ ${AnsiColor.BRIGHT_YELLOW}█     ${AnsiColor.BRIGHT_GREEN}  █
+  ${AnsiColor.BRIGHT_GREEN}█     ${AnsiColor.BRIGHT_YELLOW}█   █ ${AnsiColor.BRIGHT_GREEN}█████ ${AnsiColor.BRIGHT_YELLOW}████  ${AnsiColor.BRIGHT_GREEN} ███  ${AnsiColor.BRIGHT_YELLOW}█████ ${AnsiColor.BRIGHT_GREEN}  █
+
+${AnsiColor.BRIGHT_GREEN}  ┌─────────────────────────────────────────────────────────────────┐
+${AnsiColor.BRIGHT_GREEN}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}SERVICE   ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_GREEN}product-service                                 ${AnsiColor.BRIGHT_GREEN}│
+${AnsiColor.BRIGHT_GREEN}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}ROLE      ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_YELLOW}Product catalog & image management              ${AnsiColor.BRIGHT_GREEN}│
+${AnsiColor.BRIGHT_GREEN}  │  ${AnsiColor.BRIGHT_WHITE}>> ${AnsiColor.BRIGHT_YELLOW}PROJECT   ${AnsiColor.BRIGHT_WHITE}: ${AnsiColor.BRIGHT_GREEN}noshop                                          ${AnsiColor.BRIGHT_GREEN}│
+${AnsiColor.BRIGHT_GREEN}  └─────────────────────────────────────────────────────────────────┘
+${AnsiColor.DEFAULT}
+${AnsiColor.BRIGHT_WHITE}   ${application.title}${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_GREEN}v${application.version}
+${AnsiColor.BRIGHT_BLUE}   Powered by Spring Boot ${AnsiColor.BRIGHT_WHITE}${spring-boot.version}
+${AnsiColor.DEFAULT}
+   ${AnsiColor.BRIGHT_GREEN}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_WHITE}Product Service${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_GREEN}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_BLUE}Spring Boot ${AnsiColor.BRIGHT_GREEN}v${spring-boot.version}${AnsiColor.DEFAULT}
+   ${AnsiColor.BRIGHT_GREEN}::${AnsiColor.DEFAULT} ${AnsiColor.BRIGHT_WHITE}Developer       ${AnsiColor.DEFAULT}  ${AnsiColor.BRIGHT_GREEN}::${AnsiColor.DEFAULT} akshay-knows
 ${AnsiColor.DEFAULT}
