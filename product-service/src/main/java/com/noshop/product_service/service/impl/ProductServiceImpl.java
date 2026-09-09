@@ -121,10 +121,31 @@ public class ProductServiceImpl implements ProductService {
 
         Page<Product> products;
 
-        if (categoryId != null && status != null) {
-            products = productRepository.findByCategoryIdAndStatus(categoryId, status, pageable);
+        if (categoryId != null && subCategoryId != null && status != null) {
+            products = productRepository.findByCategoryIdAndSubCategoryIdAndStatus(
+                    categoryId,
+                    subCategoryId,
+                    status,
+                    pageable
+            );
+        } else if (categoryId != null && subCategoryId != null) {
+            products = productRepository.findByCategoryIdAndSubCategoryId(
+                    categoryId,
+                    subCategoryId,
+                    pageable
+            );
+        } else if (categoryId != null && status != null) {
+            products = productRepository.findByCategoryIdAndStatus(
+                    categoryId,
+                    status,
+                    pageable
+            );
         } else if (subCategoryId != null && status != null) {
-            products = productRepository.findBySubCategoryIdAndStatus(subCategoryId, status, pageable);
+            products = productRepository.findBySubCategoryIdAndStatus(
+                    subCategoryId,
+                    status,
+                    pageable
+            );
         } else if (categoryId != null) {
             products = productRepository.findByCategoryId(categoryId, pageable);
         } else if (subCategoryId != null) {
