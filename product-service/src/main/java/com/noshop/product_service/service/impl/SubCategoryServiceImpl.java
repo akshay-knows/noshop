@@ -112,6 +112,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
                         "SubCategory not found with id: " + id
                 ));
 
-        subCategoryRepository.delete(subCategory);
+        subCategory.setActive(false);
+        subCategoryRepository.save(subCategory);
     }
 }
