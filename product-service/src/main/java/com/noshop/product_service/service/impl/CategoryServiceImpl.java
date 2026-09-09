@@ -31,7 +31,6 @@ public class CategoryServiceImpl implements CategoryService {
         }
 
         Category category = categoryMapper.toEntity(request);
-
         return categoryMapper.toResponse(categoryRepository.save(category));
     }
 
@@ -39,26 +38,44 @@ public class CategoryServiceImpl implements CategoryService {
     public CategoryResponse getCategoryById(Long id) {
 
         Category category = categoryRepository.findById(id)
-                                              .orElseThrow(() -> new ResourceNotFoundException("Category not found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Category not found with id: " + id
+                ));
 
         return categoryMapper.toResponse(category);
     }
 
     @Override
     public List<CategoryResponse> getAllCategories() {
-
         return categoryRepository.findAll()
-                                 .stream()
-                                 .map(categoryMapper::toResponse)
-                                 .toList();
+                .stream()
+                .map(categoryMapper::toResponse)
+                .toList();
     }
 
     @Override
-    public CategoryResponse updateCategory(Long id,
-                                           CreateCategoryRequest request) {
+    public CategoryResponse updateCategory(
+            Long id,
+            CreateCategoryRequest request) {
 
         Category category = categoryRepository.findById(id)
-                                              .orElseThrow(() -> new ResourceNotFoundException("Category not found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Category not found with id: " + id
+                ));
+
+        if (!category.getName().equals(request.getName())
+                && categoryRepository.existsByName(request.getName())) {
+            throw new IllegalArgumentException(
+                    "Category already exists with name: " + request.getName()
+            );
+        }
+
+        if (!category.getSlug().equals(request.getSlug())
+                && categoryRepository.existsBySlug(request.getSlug())) {
+            throw new IllegalArgumentException(
+                    "Category slug already exists: " + request.getSlug()
+            );
+        }
 
         category.setName(request.getName());
         category.setSlug(request.getSlug());
@@ -71,9 +88,10 @@ public class CategoryServiceImpl implements CategoryService {
     public void deleteCategory(Long id) {
 
         Category category = categoryRepository.findById(id)
-                                              .orElseThrow(() -> new ResourceNotFoundException("Category not found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Category not found with id: " + id
+                ));
 
         categoryRepository.delete(category);
     }
-
 }
