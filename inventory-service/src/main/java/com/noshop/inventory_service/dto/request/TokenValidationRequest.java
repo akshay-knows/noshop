@@ -1,4 +1,4 @@
-package com.ecommerce.inventoryservice.dto.request;
+package com.noshop.inventory_service.dto.request;
 
 public class TokenValidationRequest {
     private String accessToken;

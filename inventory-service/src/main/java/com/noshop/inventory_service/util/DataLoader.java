@@ -1,7 +1,7 @@
-package com.ecommerce.inventoryservice.util;
+package com.noshop.inventory_service.util;
 
-import com.ecommerce.inventoryservice.model.Inventory;
-import com.ecommerce.inventoryservice.repository.InventoryRepository;
+import com.noshop.inventory_service.entity.Inventory;
+import com.noshop.inventory_service.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;

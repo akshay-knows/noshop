@@ -1,4 +1,4 @@
-package com.ecommerce.inventoryservice.dto.response;
+package com.noshop.inventory_service.dto.response;
 
 public class TokenValidationResponse {
     private String message;
