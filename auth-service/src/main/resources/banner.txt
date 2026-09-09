@@ -1,0 +1,12 @@
+${AnsiColor.BRIGHT_YELLOW}
+    ███╗   ██╗ ██████╗ ███████╗██╗  ██╗ ██████╗ ██████╗
+    ████╗  ██║██╔═══██╗██╔════╝██║  ██║██╔═══██╗██╔══██╗
+    ██╔██╗ ██║██║   ██║███████╗███████║██║   ██║██████╔╝
+    ██║╚██╗██║██║   ██║╚════██║██╔══██║██║   ██║██╔═══╝
+    ██║ ╚████║╚██████╔╝███████║██║  ██║╚██████╔╝██║
+    ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝
+${AnsiColor.BRIGHT_CYAN}
+    :: ${AnsiColor.BRIGHT_WHITE}NoShop${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_YELLOW}Auth Service${AnsiColor.BRIGHT_CYAN}
+    :: ${AnsiColor.BRIGHT_WHITE}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
+${AnsiColor.BRIGHT_YELLOW}    :: Platform${AnsiColor.BRIGHT_WHITE}      :: Authentication & JWT
+${AnsiColor.DEFAULT}
