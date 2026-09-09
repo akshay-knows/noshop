@@ -16,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Locale;
@@ -115,6 +116,17 @@ public class ProductImageServiceImpl implements ProductImageService {
             );
         }
 
+        boolean hasImages = productImageRepository.existsByProductIdAndDisplayOrder(
+                productId,
+                1
+        );
+
+        if (!hasImages && displayOrder != 1) {
+            throw new IllegalArgumentException(
+                    "The first product image must have display order 1"
+            );
+        }
+
         if (productImageRepository.existsByProductIdAndDisplayOrder(
                 productId,
                 displayOrder
@@ -151,6 +163,7 @@ public class ProductImageServiceImpl implements ProductImageService {
     }
 
     @Override
+    @Transactional
     public void deleteImage(Long imageId) {
 
         ProductImage image = productImageRepository.findById(imageId)
@@ -159,12 +172,26 @@ public class ProductImageServiceImpl implements ProductImageService {
                 ));
 
         Long productId = image.getProduct().getId();
+        boolean deletingPrimary = image.getDisplayOrder() == 1;
 
         if (image.getStorageKey() != null && !image.getStorageKey().isBlank()) {
             s3Service.deleteFile(image.getStorageKey());
         }
 
         productImageRepository.delete(image);
+        productImageRepository.flush();
+
+        if (deletingPrimary) {
+            productImageRepository
+                    .findByProductIdOrderByDisplayOrderAsc(productId)
+                    .stream()
+                    .findFirst()
+                    .ifPresent(nextImage -> {
+                        nextImage.setDisplayOrder(1);
+                        productImageRepository.save(nextImage);
+                    });
+        }
+
         evictProductCache(productId);
     }
 
