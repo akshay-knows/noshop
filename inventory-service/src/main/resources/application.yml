@@ -15,6 +15,11 @@ spring:
       ddl-auto: update
     show-sql: true
 
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
+
 eureka:
   client:
     service-url:
@@ -30,12 +35,6 @@ management:
   endpoint:
     health:
       show-details: always
-
-spring:
-  boot:
-    admin:
-      client:
-        url: http://localhost:9090
 
 jwt:
   secret: your-very-long-secret-key-at-least-32-characters
