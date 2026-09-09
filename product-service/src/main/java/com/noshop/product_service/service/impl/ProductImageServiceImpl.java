@@ -13,9 +13,12 @@ import com.noshop.product_service.repository.ProductRepository;
 import com.noshop.product_service.service.ProductImageService;
 import com.noshop.product_service.service.S3Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 @Service
@@ -23,17 +26,13 @@ import java.util.UUID;
 public class ProductImageServiceImpl implements ProductImageService {
 
     private final ProductImageRepository productImageRepository;
-
     private final ProductRepository productRepository;
-
     private final ProductMapper productMapper;
-
     private final S3Service s3Service;
-
+    private final CacheManager cacheManager;
 
     @Override
-    public List<ProductImageResponse> getImagesByProductId(
-            Long productId) {
+    public List<ProductImageResponse> getImagesByProductId(Long productId) {
 
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException(
@@ -48,10 +47,8 @@ public class ProductImageServiceImpl implements ProductImageService {
                 .toList();
     }
 
-
     @Override
-    public ProductImageResponse getPrimaryImage(
-            Long productId) {
+    public ProductImageResponse getPrimaryImage(Long productId) {
 
         if (!productRepository.existsById(productId)) {
             throw new ResourceNotFoundException(
@@ -59,20 +56,11 @@ public class ProductImageServiceImpl implements ProductImageService {
             );
         }
 
-        ProductImage image = productImageRepository
-                .findByProductIdAndDisplayOrder(
-                        productId,
-                        1
-                )
+        return productImageRepository
+                .findByProductIdAndDisplayOrder(productId, 1)
+                .map(productMapper::toImageResponse)
                 .orElse(null);
-
-        if (image == null) {
-            return null;
-        }
-
-        return productMapper.toImageResponse(image);
     }
-
 
     @Override
     public ImageUploadResponse generateUploadUrl(
@@ -85,15 +73,8 @@ public class ProductImageServiceImpl implements ProductImageService {
             );
         }
 
-        String extension =
-                getFileExtension(
-                        request.getFileName()
-                );
-
-        validateFileExtension(
-                request.getFileName(),
-                request.getContentType()
-        );
+        String extension = getFileExtension(request.getFileName());
+        validateFileExtension(request.getFileName(), request.getContentType());
 
         String storageKey =
                 "products/"
@@ -102,24 +83,19 @@ public class ProductImageServiceImpl implements ProductImageService {
                         + UUID.randomUUID()
                         + extension;
 
-        String uploadUrl =
-                s3Service.generatePresignedUploadUrl(
-                        storageKey,
-                        request.getContentType()
-                );
+        String uploadUrl = s3Service.generatePresignedUploadUrl(
+                storageKey,
+                request.getContentType()
+        );
 
-        String imageUrl =
-                s3Service.buildCloudFrontUrl(
-                        storageKey
-                );
+        String imageUrl = s3Service.buildCloudFrontUrl(storageKey);
 
         return ImageUploadResponse.builder()
-                                  .uploadUrl(uploadUrl)
-                                  .storageKey(storageKey)
-                                  .imageUrl(imageUrl)
-                                  .build();
+                .uploadUrl(uploadUrl)
+                .storageKey(storageKey)
+                .imageUrl(imageUrl)
+                .build();
     }
-
 
     @Override
     public ProductImageResponse confirmUpload(
@@ -129,12 +105,9 @@ public class ProductImageServiceImpl implements ProductImageService {
             Integer displayOrder) {
 
         Product product = productRepository.findById(productId)
-                                           .orElseThrow(() ->
-                                                                new ResourceNotFoundException(
-                                                                        "Product not found with id: "
-                                                                                + productId
-                                                                )
-                                           );
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Product not found with id: " + productId
+                ));
 
         if (displayOrder == null || displayOrder < 1) {
             throw new IllegalArgumentException(
@@ -142,176 +115,126 @@ public class ProductImageServiceImpl implements ProductImageService {
             );
         }
 
-        if (productImageRepository
-                .existsByProductIdAndDisplayOrder(
-                        productId,
-                        displayOrder
-                )) {
-
+        if (productImageRepository.existsByProductIdAndDisplayOrder(
+                productId,
+                displayOrder
+        )) {
             throw new IllegalArgumentException(
-                    "Image display order already exists: "
-                            + displayOrder
+                    "Image display order already exists: " + displayOrder
             );
         }
 
-        // Security validation:
-        // Make sure the storage key belongs to this product.
-        validateStorageKey(
-                productId,
-                storageKey
-        );
+        validateStorageKey(productId, storageKey);
+        validateFileExtension(request.getFileName(), request.getContentType());
 
-        // Make sure the file extension matches
-        // the declared content type.
-        validateFileExtension(
-                request.getFileName(),
-                request.getContentType()
-        );
-
-        // Make sure the client actually uploaded
-        // the object to S3 before saving metadata.
         if (!s3Service.objectExists(storageKey)) {
             throw new IllegalArgumentException(
                     "Uploaded image does not exist in S3"
             );
         }
 
-        String imageUrl =
-                s3Service.buildCloudFrontUrl(
-                        storageKey
-                );
+        String imageUrl = s3Service.buildCloudFrontUrl(storageKey);
 
         ProductImage image = ProductImage.builder()
-                                         .imageUrl(imageUrl)
-                                         .storageKey(storageKey)
-                                         .altText(request.getAltText())
-                                         .displayOrder(displayOrder)
-                                         .source(ImageSource.CATALOG)
-                                         .product(product)
-                                         .build();
+                .imageUrl(imageUrl)
+                .storageKey(storageKey)
+                .altText(request.getAltText())
+                .displayOrder(displayOrder)
+                .source(ImageSource.CATALOG)
+                .product(product)
+                .build();
 
-        ProductImage savedImage =
-                productImageRepository.save(image);
+        ProductImage savedImage = productImageRepository.save(image);
+        evictProductCache(productId);
 
-        return productMapper.toImageResponse(
-                savedImage
-        );
+        return productMapper.toImageResponse(savedImage);
     }
 
-
     @Override
-    public void deleteImage(
-            Long imageId) {
+    public void deleteImage(Long imageId) {
 
-        ProductImage image = productImageRepository
-                .findById(imageId)
-                .orElseThrow(() ->
-                                     new ResourceNotFoundException(
-                                             "Product image not found with id: "
-                                                     + imageId
-                                     )
-                );
+        ProductImage image = productImageRepository.findById(imageId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Product image not found with id: " + imageId
+                ));
 
-        if (image.getStorageKey() != null) {
+        Long productId = image.getProduct().getId();
 
-            s3Service.deleteFile(
-                    image.getStorageKey()
-            );
+        if (image.getStorageKey() != null && !image.getStorageKey().isBlank()) {
+            s3Service.deleteFile(image.getStorageKey());
         }
 
         productImageRepository.delete(image);
+        evictProductCache(productId);
     }
 
+    private void evictProductCache(Long productId) {
+        Cache cache = cacheManager.getCache("products");
+        if (cache != null) {
+            cache.evict(productId);
+        }
+    }
 
-    private void validateStorageKey(
-            Long productId,
-            String storageKey) {
+    private void validateStorageKey(Long productId, String storageKey) {
 
-        if (storageKey == null ||
-                storageKey.isBlank()) {
-
-            throw new IllegalArgumentException(
-                    "Storage key is required"
-            );
+        if (storageKey == null || storageKey.isBlank()) {
+            throw new IllegalArgumentException("Storage key is required");
         }
 
-        String expectedPrefix =
-                "products/"
-                        + productId
-                        + "/images/";
+        String expectedPrefix = "products/" + productId + "/images/";
 
-        if (!storageKey.startsWith(expectedPrefix)) {
-
+        if (!storageKey.startsWith(expectedPrefix)
+                || storageKey.contains("..")
+                || storageKey.contains("\\")) {
             throw new IllegalArgumentException(
                     "Invalid storage key for product"
             );
         }
     }
 
-
     private void validateFileExtension(
             String fileName,
             String contentType) {
 
-        if (fileName == null ||
-                fileName.isBlank()) {
-
-            throw new IllegalArgumentException(
-                    "File name is required"
-            );
+        if (fileName == null || fileName.isBlank()) {
+            throw new IllegalArgumentException("File name is required");
         }
 
-        if (contentType == null ||
-                contentType.isBlank()) {
-
-            throw new IllegalArgumentException(
-                    "Content type is required"
-            );
+        if (contentType == null || contentType.isBlank()) {
+            throw new IllegalArgumentException("Content type is required");
         }
 
-        String lowerFileName =
-                fileName.toLowerCase();
+        String lowerFileName = fileName.toLowerCase(Locale.ROOT);
+        String lowerContentType = contentType.toLowerCase(Locale.ROOT);
 
-        boolean valid = switch (contentType.toLowerCase()) {
-
-            case "image/jpeg",
-                 "image/jpg" ->
+        boolean valid = switch (lowerContentType) {
+            case "image/jpeg", "image/jpg" ->
                     lowerFileName.endsWith(".jpg")
                             || lowerFileName.endsWith(".jpeg");
-
-            case "image/png" ->
-                    lowerFileName.endsWith(".png");
-
-            case "image/webp" ->
-                    lowerFileName.endsWith(".webp");
-
+            case "image/png" -> lowerFileName.endsWith(".png");
+            case "image/webp" -> lowerFileName.endsWith(".webp");
             default -> false;
         };
 
         if (!valid) {
-
             throw new IllegalArgumentException(
                     "File extension does not match content type"
             );
         }
     }
 
+    private String getFileExtension(String fileName) {
 
-    private String getFileExtension(
-            String fileName) {
-
-        int lastDot =
-                fileName.lastIndexOf('.');
-
-        if (lastDot == -1) {
-
-            throw new IllegalArgumentException(
-                    "File must have an extension"
-            );
+        if (fileName == null || fileName.isBlank()) {
+            throw new IllegalArgumentException("File name is required");
         }
 
-        return fileName
-                .substring(lastDot)
-                .toLowerCase();
+        int lastDot = fileName.lastIndexOf('.');
+
+        if (lastDot == -1 || lastDot == fileName.length() - 1) {
+            throw new IllegalArgumentException("File must have an extension");
+        }
+
+        return fileName.substring(lastDot).toLowerCase(Locale.ROOT);
     }
 }
