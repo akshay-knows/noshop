@@ -20,6 +20,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             SELECT DISTINCT p
             FROM Product p
             LEFT JOIN FETCH p.images
+            LEFT JOIN FETCH p.brand
+            LEFT JOIN FETCH p.category
+            LEFT JOIN FETCH p.subCategory
             WHERE p.id = :id
             """)
     Optional<Product> findByIdWithImages(
