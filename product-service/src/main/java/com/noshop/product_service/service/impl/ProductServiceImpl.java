@@ -1,20 +1,18 @@
 package com.noshop.product_service.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.noshop.common.exception.ResourceNotFoundException;
 import com.noshop.product_service.dto.request.CreateProductRequest;
 import com.noshop.product_service.dto.response.ProductResponse;
-import com.noshop.product_service.entity.Brand;
-import com.noshop.product_service.entity.Category;
-import com.noshop.product_service.entity.Product;
-import com.noshop.product_service.entity.ProductImage;
-import com.noshop.product_service.entity.SubCategory;
+import com.noshop.product_service.entity.*;
 import com.noshop.product_service.enums.ProductStatus;
+import com.noshop.product_service.event.ProductCreatedEvent;
+import com.noshop.product_service.event.ProductVariantEvent;
 import com.noshop.product_service.mapper.ProductMapper;
-import com.noshop.product_service.repository.BrandRepository;
-import com.noshop.product_service.repository.CategoryRepository;
-import com.noshop.product_service.repository.ProductImageRepository;
-import com.noshop.product_service.repository.ProductRepository;
-import com.noshop.product_service.repository.SubCategoryRepository;
+import com.noshop.product_service.outbox.OutboxEvent;
+import com.noshop.product_service.outbox.OutboxEventRepository;
+import com.noshop.product_service.outbox.OutboxStatus;
+import com.noshop.product_service.repository.*;
 import com.noshop.product_service.service.ProductService;
 import com.noshop.product_service.service.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +21,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -46,9 +45,12 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     private final S3Service s3Service;
+    private final OutboxEventRepository outboxEventRepository;
 
+    private final ObjectMapper objectMapper;
 
     @Override
+    @Transactional
     public ProductResponse createProduct(CreateProductRequest request) {
 
         if (productRepository.existsBySlug(request.getSlug())) {
@@ -88,6 +90,42 @@ public class ProductServiceImpl implements ProductService {
         product.setSubCategory(subCategory);
 
         Product savedProduct = productRepository.save(product);
+        ProductCreatedEvent event = ProductCreatedEvent.builder()
+                                                       .productId(savedProduct.getId())
+                                                       .name(savedProduct.getName())
+                                                       .status(savedProduct.getStatus().name())
+                                                       .createdAt(savedProduct.getCreatedAt())
+                                                       .variants(
+                                                               savedProduct.getVariants()
+                                                                           .stream()
+                                                                           .map(variant -> ProductVariantEvent.builder()
+                                                                                                              .variantId(variant.getId())
+                                                                                                              .sku(variant.getSku())
+                                                                                                              .packSize(variant.getPackSize())
+                                                                                                              .unit(variant.getUnit())
+                                                                                                              .price(variant.getPrice())
+                                                                                                              .build())
+                                                                           .toList()
+                                                       )
+                                                       .build();
+
+        try {
+            OutboxEvent outboxEvent = OutboxEvent.builder()
+                                                 .eventType("PRODUCT_CREATED")
+                                                 .aggregateId(savedProduct.getId())
+                                                 .payload(objectMapper.writeValueAsString(event))
+                                                 .status(OutboxStatus.PENDING)
+                                                 .createdAt(java.time.LocalDateTime.now())
+                                                 .build();
+
+            outboxEventRepository.save(outboxEvent);
+
+        } catch (JsonProcessingException e) {
+            throw new IllegalStateException(
+                    "Failed to serialize product-created event",
+                    e
+            );
+        }
 
         return productMapper.toResponse(savedProduct);
     }
