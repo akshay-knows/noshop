@@ -15,7 +15,7 @@ public class ProductVariantEvent {
 
     private Long variantId;
     private String sku;
-    private String packSize;
+    private BigDecimal packSize;
     private String unit;
     private BigDecimal price;
 }
