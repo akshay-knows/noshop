@@ -1,12 +1,8 @@
 ${AnsiColor.BRIGHT_GREEN}
-    ███╗   ██╗ ██████╗ ███████╗██╗  ██╗ ██████╗ ██████╗
-    ████╗  ██║██╔═══██╗██╔════╝██║  ██║██╔═══██╗██╔══██╗
-    ██╔██╗ ██║██║   ██║███████╗███████║██║   ██║██████╔╝
-    ██║╚██╗██║██║   ██║╚════██║██╔══██║██║   ██║██╔═══╝
-    ██║ ╚████║╚██████╔╝███████║██║  ██║╚██████╔╝██║
-    ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝
+    ╔══════════════════════════════════════╗
+    ║            PRODUCT SERVICE             ║
+    ╚══════════════════════════════════════╝
 ${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}NoShop${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}Product Service${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_YELLOW}* ${spring-boot.version}
-${AnsiColor.BRIGHT_GREEN}    :: Platform${AnsiColor.BRIGHT_WHITE}      :: Product Catalog
+    :: ${AnsiColor.BRIGHT_WHITE}Product Service${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_YELLOW}* ${spring-boot.version}
+${AnsiColor.BRIGHT_GREEN}    :: Platform${AnsiColor.BRIGHT_WHITE} :: Product Catalog
 ${AnsiColor.DEFAULT}
