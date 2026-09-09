@@ -1,12 +1,8 @@
 ${AnsiColor.BRIGHT_YELLOW}
-    ███╗   ██╗ ██████╗ ███████╗██╗  ██╗ ██████╗ ██████╗
-    ████╗  ██║██╔═══██╗██╔════╝██║  ██║██╔═══██╗██╔══██╗
-    ██╔██╗ ██║██║   ██║███████╗███████║██║   ██║██████╔╝
-    ██║╚██╗██║██║   ██║╚════██║██╔══██║██║   ██║██╔═══╝
-    ██║ ╚████║╚██████╔╝███████║██║  ██║╚██████╔╝██║
-    ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝
+    ╔══════════════════════════════════════╗
+    ║              AUTH SERVICE              ║
+    ╚══════════════════════════════════════╝
 ${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}NoShop${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_YELLOW}Auth Service${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
-${AnsiColor.BRIGHT_YELLOW}    :: Platform${AnsiColor.BRIGHT_WHITE}      :: Authentication & JWT
+    :: ${AnsiColor.BRIGHT_WHITE}Auth Service${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_YELLOW}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
+${AnsiColor.BRIGHT_YELLOW}    :: Platform${AnsiColor.BRIGHT_WHITE} :: Authentication & JWT
 ${AnsiColor.DEFAULT}
