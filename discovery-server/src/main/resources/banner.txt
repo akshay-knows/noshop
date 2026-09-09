@@ -1,12 +1,8 @@
 ${AnsiColor.BRIGHT_BLUE}
-    ███╗   ██╗ ██████╗ ███████╗██╗  ██╗ ██████╗ ██████╗
-    ████╗  ██║██╔═══██╗██╔════╝██║  ██║██╔═══██╗██╔══██╗
-    ██╔██╗ ██║██║   ██║███████╗███████║██║   ██║██████╔╝
-    ██║╚██╗██║██║   ██║╚════██║██╔══██║██║   ██║██╔═══╝
-    ██║ ╚████║╚██████╔╝███████║██║  ██║╚██████╔╝██║
-    ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝
+    ╔══════════════════════════════════════╗
+    ║           DISCOVERY SERVER            ║
+    ╚══════════════════════════════════════╝
 ${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}NoShop${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_BLUE}Discovery Server${AnsiColor.BRIGHT_CYAN}
-    :: ${AnsiColor.BRIGHT_WHITE}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
-${AnsiColor.BRIGHT_BLUE}    :: Platform${AnsiColor.BRIGHT_WHITE}      :: Eureka Service Discovery
+    :: ${AnsiColor.BRIGHT_WHITE}Discovery Server${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_BLUE}Spring Boot${AnsiColor.BRIGHT_CYAN} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
+${AnsiColor.BRIGHT_BLUE}    :: Platform${AnsiColor.BRIGHT_WHITE} :: Eureka Service Discovery
 ${AnsiColor.DEFAULT}
