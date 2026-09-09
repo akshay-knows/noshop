@@ -34,8 +34,9 @@ public class SubCategoryServiceImpl implements SubCategoryService {
         }
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                                              .orElseThrow(() ->
-                                                                   new ResourceNotFoundException("Category not found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Category not found with id: " + request.getCategoryId()
+                ));
 
         SubCategory subCategory = subCategoryMapper.toEntity(request);
         subCategory.setCategory(category);
@@ -49,31 +50,49 @@ public class SubCategoryServiceImpl implements SubCategoryService {
     public SubCategoryResponse getSubCategoryById(Long id) {
 
         SubCategory subCategory = subCategoryRepository.findById(id)
-                                                       .orElseThrow(() ->
-                                                                            new ResourceNotFoundException("SubCategory not found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "SubCategory not found with id: " + id
+                ));
 
         return subCategoryMapper.toResponse(subCategory);
     }
 
     @Override
     public List<SubCategoryResponse> getAllSubCategories() {
-
         return subCategoryRepository.findAll()
-                                    .stream()
-                                    .map(subCategoryMapper::toResponse)
-                                    .toList();
+                .stream()
+                .map(subCategoryMapper::toResponse)
+                .toList();
     }
 
     @Override
-    public SubCategoryResponse updateSubCategory(Long id, CreateSubCategoryRequest request) {
+    public SubCategoryResponse updateSubCategory(
+            Long id,
+            CreateSubCategoryRequest request) {
 
         SubCategory subCategory = subCategoryRepository.findById(id)
-                                                       .orElseThrow(() ->
-                                                                            new ResourceNotFoundException("SubCategory not found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "SubCategory not found with id: " + id
+                ));
+
+        if (!subCategory.getName().equals(request.getName())
+                && subCategoryRepository.existsByName(request.getName())) {
+            throw new IllegalArgumentException(
+                    "SubCategory already exists with name: " + request.getName()
+            );
+        }
+
+        if (!subCategory.getSlug().equals(request.getSlug())
+                && subCategoryRepository.existsBySlug(request.getSlug())) {
+            throw new IllegalArgumentException(
+                    "SubCategory slug already exists: " + request.getSlug()
+            );
+        }
 
         Category category = categoryRepository.findById(request.getCategoryId())
-                                              .orElseThrow(() ->
-                                                                   new ResourceNotFoundException("Category not found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Category not found with id: " + request.getCategoryId()
+                ));
 
         subCategory.setName(request.getName());
         subCategory.setSlug(request.getSlug());
@@ -89,8 +108,9 @@ public class SubCategoryServiceImpl implements SubCategoryService {
     public void deleteSubCategory(Long id) {
 
         SubCategory subCategory = subCategoryRepository.findById(id)
-                                                       .orElseThrow(() ->
-                                                                            new ResourceNotFoundException("SubCategory not found."));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "SubCategory not found with id: " + id
+                ));
 
         subCategoryRepository.delete(subCategory);
     }
