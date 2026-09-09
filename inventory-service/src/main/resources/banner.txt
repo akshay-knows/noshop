@@ -1,12 +1,8 @@
 ${AnsiColor.BRIGHT_CYAN}
-    ███╗   ██╗ ██████╗ ███████╗██╗  ██╗ ██████╗ ██████╗
-    ████╗  ██║██╔═══██╗██╔════╝██║  ██║██╔═══██╗██╔══██╗
-    ██╔██╗ ██║██║   ██║███████╗███████║██║   ██║██████╔╝
-    ██║╚██╗██║██║   ██║╚════██║██╔══██║██║   ██║██╔═══╝
-    ██║ ╚████║╚██████╔╝███████║██║  ██║╚██████╔╝██║
-    ╚═╝  ╚═══╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═╝
+    ╔══════════════════════════════════════╗
+    ║           INVENTORY SERVICE            ║
+    ╚══════════════════════════════════════╝
 ${AnsiColor.BRIGHT_BLUE}
-    :: ${AnsiColor.BRIGHT_WHITE}NoShop${AnsiColor.BRIGHT_BLUE} :: ${AnsiColor.BRIGHT_CYAN}Inventory Service${AnsiColor.BRIGHT_BLUE}
-    :: ${AnsiColor.BRIGHT_WHITE}Spring Boot${AnsiColor.BRIGHT_BLUE} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
-${AnsiColor.BRIGHT_CYAN}    :: Platform${AnsiColor.BRIGHT_WHITE}      :: Inventory & Stock Management
+    :: ${AnsiColor.BRIGHT_WHITE}Inventory Service${AnsiColor.BRIGHT_BLUE} :: ${AnsiColor.BRIGHT_CYAN}Spring Boot${AnsiColor.BRIGHT_BLUE} :: ${AnsiColor.BRIGHT_GREEN}* ${spring-boot.version}
+${AnsiColor.BRIGHT_CYAN}    :: Platform${AnsiColor.BRIGHT_WHITE} :: Inventory & Stock Management
 ${AnsiColor.DEFAULT}
