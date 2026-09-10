@@ -5,27 +5,16 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.List;
 
-/**
- * Issues and validates JWTs for authenticated users.
- * <p>
- * generateToken(): builds a signed JWT with the user's email (username) as the
- * subject, an issued-at timestamp, and an expiry based on {@code jwt.expiration}.
- * <p>
- * Validation flow: extractAllClaims() parses + verifies the token's signature in
- * one step (parseSignedClaims throws if the signature or structure is invalid) —
- * extractUsername()/extractExpiration() then read individual claims from that
- * payload, and isTokenValid() combines both checks (username match + not expired)
- * into the single check callers actually need.
- * <p>
- * The signing key is built once in init() from the raw secret string, rather than
- * re-deriving it from {@code secret} on every call.
- */
+/** Creates signed JWTs containing the user's identity and roles. */
 @Service
 public class JwtService {
 
@@ -37,52 +26,67 @@ public class JwtService {
 
     private SecretKey secretKey;
 
-    /** Derives the HMAC signing key once at startup from the configured secret. */
+    /** Builds the HMAC signing key once when the service starts. */
     @PostConstruct
     public void init() {
-        secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+        secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
-    /** Builds a signed JWT for the given user, encoding their email as the subject. */
+    /** Creates a signed JWT containing the username and granted roles. */
     public String generateToken(UserDetails userDetails) {
+        List<String> roles = userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
+
         return Jwts.builder()
-                   .subject(userDetails.getUsername())                 // sub claim
-                   .issuedAt(new Date())                               // iat claim
-                   .expiration(new Date(System.currentTimeMillis() + jwtExpiration)) // exp claim
-                   .signWith(secretKey)                                // Digital Signature
-                   .compact();                                         // Convert to JWT String
+                .subject(userDetails.getUsername())
+                .claim("roles", roles)
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + jwtExpiration))
+                .signWith(secretKey)
+                .compact();
     }
 
-    /** Parses and verifies the token's signature, returning its claims payload. */
+    /** Parses and verifies a signed JWT and returns its claims. */
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                   .verifyWith(secretKey)
-                   .build()
-                   .parseSignedClaims(token)
-                   .getPayload();
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
-    /** Reads the subject (email) out of a valid token. */
+    /** Extracts the authenticated user's email from the token subject. */
     public String extractUsername(String token) {
         return extractAllClaims(token).getSubject();
     }
 
-    /** Reads the expiration timestamp out of a valid token. */
-    private Date extractExpiration(String token) {
-        return extractAllClaims(token).getExpiration();
+    /** Extracts the role authorities embedded in the token. */
+    public List<String> extractRoles(String token) {
+        Object value = extractAllClaims(token).get("roles");
+
+        if (value instanceof List<?> roles) {
+            return roles.stream()
+                    .map(String::valueOf)
+                    .toList();
+        }
+
+        if (value instanceof String role) {
+            return List.of(role);
+        }
+
+        return List.of();
     }
 
-    /** Checks whether the token's expiry has already passed. */
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
-    }
-
-    /** Combines identity check + expiry check into the single validation callers need. */
-    public boolean isTokenValid(String token, UserDetails userDetails) {
-        // Confirm the token actually belongs to this user, and hasn't expired.
-        String username = extractUsername(token);
-
-        return username.equals(userDetails.getUsername())
-                && !isTokenExpired(token);
+    /** Returns true when the token is structurally valid and has not expired. */
+    public boolean isTokenValid(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            return claims.getSubject() != null
+                    && claims.getExpiration() != null
+                    && !claims.getExpiration().before(new Date());
+        } catch (Exception ex) {
+            return false;
+        }
     }
 }
