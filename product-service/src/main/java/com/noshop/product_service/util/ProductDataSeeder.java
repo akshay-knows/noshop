@@ -50,6 +50,7 @@ public class ProductDataSeeder implements CommandLineRunner {
     @Value("${noshop.seed.product-count:1000}")
     private int productCount;
 
+    /** Creates the configured demo catalog only when seeding is explicitly enabled. */
     @Override
     @Transactional
     public void run(String... args) {
@@ -113,6 +114,7 @@ public class ProductDataSeeder implements CommandLineRunner {
         productRepository.saveAll(products);
     }
 
+    /** Ensures the reusable demo brands exist before products are created. */
     private List<Brand> ensureBrands() {
         List<Brand> brands = new ArrayList<>();
 
@@ -131,19 +133,21 @@ public class ProductDataSeeder implements CommandLineRunner {
         return brands;
     }
 
+    /** Ensures the reusable demo categories exist before products are created. */
     private List<Category> ensureCategories() {
         List<Category> categories = new ArrayList<>();
 
         for (int i = 0; i < CATEGORY_NAMES.size(); i++) {
             String name = CATEGORY_NAMES.get(i);
             String slug = name.toLowerCase().replace(' ', '-');
+            int displayOrder = i + 1;
 
             Category category = categoryRepository.findBySlug(slug)
                     .orElseGet(() -> categoryRepository.save(
                             Category.builder()
                                     .name(name)
                                     .slug(slug)
-                                    .displayOrder(i + 1)
+                                    .displayOrder(displayOrder)
                                     .active(true)
                                     .build()
                     ));
@@ -153,6 +157,7 @@ public class ProductDataSeeder implements CommandLineRunner {
         return categories;
     }
 
+    /** Ensures one deterministic demo subcategory exists for the selected category. */
     private SubCategory ensureSubCategory(Category category, int suffix) {
         String slug = category.getSlug() + "-demo-" + suffix;
 
