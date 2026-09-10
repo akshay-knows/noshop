@@ -1,0 +1,7 @@
+# Use this workspace to collaborate
+workspace:
+  id: a4b6cab8-ddd0-4527-b4d4-e724e6818a07
+
+localResources:
+  environments:
+    - ../NoShop — Local-1.environment.yaml

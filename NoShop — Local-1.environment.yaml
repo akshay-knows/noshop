@@ -1,0 +1,28 @@
+name: NoShop — Local
+values:
+  - key: auth_base_url
+    value: 'http://localhost:8081'
+  - key: product_base_url
+    value: 'http://localhost:8082'
+  - key: inventory_base_url
+    value: 'http://localhost:8083'
+  - key: gateway_base_url
+    value: 'http://localhost:8080'
+  - key: access_token
+    value: ''
+  - key: user_email
+    value: asha.patel@noshop.test
+  - key: user_password
+    value: Password123
+  - key: brand_id
+    value: '1'
+  - key: category_id
+    value: '1'
+  - key: subcategory_id
+    value: '1'
+  - key: product_id
+    value: '1'
+  - key: variant_id
+    value: '1'
+  - key: warehouse_id
+    value: '1'

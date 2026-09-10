@@ -1,0 +1,2177 @@
+{
+  "info": {
+    "name": "NoShop - Complete API",
+    "description": "Collection generated from the actual repository code. It includes the routes that exist in auth-service, product-service, inventory-service, and the API gateway. Order-service and payment-service are not implemented in the current repository and are intentionally omitted.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_postman_id": "a9d2c46e-daf7-4545-a6c2-6b7e3d2b1d5c"
+  },
+  "item": [
+    {
+      "name": "🔐 AUTH SERVICE",
+      "description": "Public authentication endpoints in auth-service.",
+      "item": [
+        {
+          "name": "Register User",
+          "description": "Registers a new user. This is a public endpoint; no bearer token is required. The response includes a JWT token.",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Asha\",\n  \"lastName\": \"Patel\",\n  \"email\": \"asha.patel@noshop.test\",\n  \"password\": \"Password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{auth_base_url}}/api/v1/auth/register",
+              "host": [
+                "{{auth_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () { pm.expect(pm.response.code).to.eql(201); });",
+                  "const json = pm.response.json();",
+                  "if (json && json.token) { pm.environment.set(\"access_token\", json.token); }",
+                  "if (json && json.email) { pm.environment.set(\"user_email\", json.email); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "description": "Authenticates a user and returns a JWT token. The token is automatically saved to {{access_token}} for later protected requests.",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{auth_base_url}}/api/v1/auth/login",
+              "host": [
+                "{{auth_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.expect(pm.response.code).to.eql(200); });",
+                  "const json = pm.response.json();",
+                  "if (json && json.token) { pm.environment.set(\"access_token\", json.token); }",
+                  "if (json && json.email) { pm.environment.set(\"user_email\", json.email); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "🚪 API GATEWAY",
+      "description": "Gateway routes configured in api-gateway application.properties: /api/v1/auth/**, /api/v1/product/**, and /api/v1/inventory/**.",
+      "item": [
+        {
+          "name": "Gateway: Register User",
+          "description": "Gateway route to the auth-service registration endpoint.",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Asha\",\n  \"lastName\": \"Patel\",\n  \"email\": \"asha.patel@noshop.test\",\n  \"password\": \"Password123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gateway_base_url}}/api/v1/auth/register",
+              "host": [
+                "{{gateway_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gateway: Login User",
+          "description": "Gateway route to the auth-service login endpoint. Saves the JWT into {{access_token}} for downstream requests.",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{user_email}}\",\n  \"password\": \"{{user_password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{gateway_base_url}}/api/v1/auth/login",
+              "host": [
+                "{{gateway_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.expect(pm.response.code).to.eql(200); });",
+                  "const json = pm.response.json();",
+                  "if (json && json.token) { pm.environment.set(\"access_token\", json.token); }",
+                  "if (json && json.email) { pm.environment.set(\"user_email\", json.email); }"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Gateway: List Products",
+          "description": "Public gateway route to the product-service product listing endpoint.",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway_base_url}}/api/v1/product/products?page=0&size=10",
+              "host": [
+                "{{gateway_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gateway: Get Product By ID",
+          "description": "Gateway route to fetch one product by id. In the repo, product reads are cached in Redis by the product service.",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway_base_url}}/api/v1/product/products/{{product_id}}",
+              "host": [
+                "{{gateway_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Gateway: List Warehouses",
+          "description": "Gateway route to the inventory-service warehouse listing endpoint. Requests are protected by JWT validation in the service security configuration.",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{gateway_base_url}}/api/v1/inventory/warehouses",
+              "host": [
+                "{{gateway_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "inventory",
+                "warehouses"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "📦 PRODUCT SERVICE",
+      "item": [
+        {
+          "name": "Products",
+          "item": [
+            {
+              "name": "Create Product",
+              "description": "Creates a catalog product. This endpoint also pushes a PRODUCT_CREATED outbox event in product-service.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Organic Whole Milk\",\n  \"slug\": \"organic-whole-milk\",\n  \"description\": \"Fresh organic whole milk for daily nutrition.\",\n  \"productType\": \"GROCERY\",\n  \"brandId\": {{brand_id}},\n  \"categoryId\": {{category_id}},\n  \"subCategoryId\": {{subcategory_id}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/products",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "products"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 201\", function () { pm.expect(pm.response.code).to.eql(201); });",
+                      "const json = pm.response.json();",
+                      "if (json && json.id) { pm.environment.set(\"product_id\", json.id.toString()); }"
+                    ]
+                  }
+                }
+              ],
+              "response": []
+            },
+            {
+              "name": "Get All Products",
+              "description": "Returns a paginated product list. Optional filters are categoryId, subCategoryId, and status.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/products?page=0&size=10&status=ACTIVE",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "products"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "10"
+                    },
+                    {
+                      "key": "status",
+                      "value": "ACTIVE"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Product By ID",
+              "description": "Returns one product by id. This read is cached in Redis by product-service.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/products/{{product_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "products",
+                    "{{product_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Search Products",
+              "description": "Searches products using the required query parameter.",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/products/search?query=milk&page=0&size=10",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "products",
+                    "search"
+                  ],
+                  "query": [
+                    {
+                      "key": "query",
+                      "value": "milk"
+                    },
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "size",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Product",
+              "description": "Updates an existing product. The same DTO shape as the create endpoint is used, and the Redis cache entry for this product is evicted.",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Organic Whole Milk\",\n  \"slug\": \"organic-whole-milk\",\n  \"description\": \"Updated organic whole milk for daily nutrition.\",\n  \"productType\": \"GROCERY\",\n  \"brandId\": {{brand_id}},\n  \"categoryId\": {{category_id}},\n  \"subCategoryId\": {{subcategory_id}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/products/{{product_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "products",
+                    "{{product_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Product Status",
+              "description": "Updates the lifecycle status of a product. Valid values are ACTIVE, INACTIVE, and DISCONTINUED.",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"ACTIVE\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/products/{{product_id}}/status",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "products",
+                    "{{product_id}}",
+                    "status"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Product",
+              "description": "Deletes a product by id. The service also evicts the Redis cache entry for that product.",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/products/{{product_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "products",
+                    "{{product_id}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Brands",
+          "item": [
+            {
+              "name": "Create Brand",
+              "description": "Creates a brand record. This is required before creating a product.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Apex\",\n  \"description\": \"Premium everyday essentials\",\n  \"logoUrl\": \"https://cdn.example.com/brands/apex.png\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/brands",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "brands"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 201\", function () { pm.expect(pm.response.code).to.eql(201); });",
+                      "const json = pm.response.json();",
+                      "if (json && json.id) { pm.environment.set(\"brand_id\", json.id.toString()); }"
+                    ]
+                  }
+                }
+              ],
+              "response": []
+            },
+            {
+              "name": "Get All Brands",
+              "description": "Lists all brands.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/brands",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "brands"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Brand By ID",
+              "description": "Returns a single brand by id.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/brands/{{brand_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "brands",
+                    "{{brand_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Brand",
+              "description": "Updates an existing brand using the same fields as the create endpoint.",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Apex\",\n  \"description\": \"Premium everyday essentials\",\n  \"logoUrl\": \"https://cdn.example.com/brands/apex.png\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/brands/{{brand_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "brands",
+                    "{{brand_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Brand",
+              "description": "Deletes a brand by id.",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/brands/{{brand_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "brands",
+                    "{{brand_id}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Categories",
+          "item": [
+            {
+              "name": "Create Category",
+              "description": "Creates a category. This is needed before creating a subcategory or product.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Beverages\",\n  \"slug\": \"beverages\",\n  \"displayOrder\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/categories",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "categories"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 201\", function () { pm.expect(pm.response.code).to.eql(201); });",
+                      "const json = pm.response.json();",
+                      "if (json && json.id) { pm.environment.set(\"category_id\", json.id.toString()); }"
+                    ]
+                  }
+                }
+              ],
+              "response": []
+            },
+            {
+              "name": "Get Category By ID",
+              "description": "Returns a category by id.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/categories/{{category_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "categories",
+                    "{{category_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Categories",
+              "description": "Lists all categories.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/categories",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Category",
+              "description": "Updates a category record.",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Beverages\",\n  \"slug\": \"beverages\",\n  \"displayOrder\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/categories/{{category_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "categories",
+                    "{{category_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Category",
+              "description": "Deletes a category by id.",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/categories/{{category_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "categories",
+                    "{{category_id}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Subcategories",
+          "item": [
+            {
+              "name": "Create Subcategory",
+              "description": "Creates a subcategory under a category. This is required for product creation.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Milk & Dairy\",\n  \"slug\": \"milk-and-dairy\",\n  \"displayOrder\": 1,\n  \"categoryId\": {{category_id}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/subcategories",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "subcategories"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 201\", function () { pm.expect(pm.response.code).to.eql(201); });",
+                      "const json = pm.response.json();",
+                      "if (json && json.id) { pm.environment.set(\"subcategory_id\", json.id.toString()); }"
+                    ]
+                  }
+                }
+              ],
+              "response": []
+            },
+            {
+              "name": "Get All Subcategories",
+              "description": "Lists all subcategories.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/subcategories",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "subcategories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Subcategory By ID",
+              "description": "Returns a subcategory by id.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/subcategories/{{subcategory_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "subcategories",
+                    "{{subcategory_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Subcategory",
+              "description": "Updates a subcategory using the same fields as create.",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Milk & Dairy\",\n  \"slug\": \"milk-and-dairy\",\n  \"displayOrder\": 1,\n  \"categoryId\": {{category_id}}\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/subcategories/{{subcategory_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "subcategories",
+                    "{{subcategory_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Subcategory",
+              "description": "Deletes a subcategory by id.",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/subcategories/{{subcategory_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "subcategories",
+                    "{{subcategory_id}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Variants",
+          "item": [
+            {
+              "name": "Create Variant",
+              "description": "Creates a product variant for a product. This is required before inventory creation.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sku\": \"OWM-1L-001\",\n  \"packSize\": 1,\n  \"unit\": \"L\",\n  \"price\": 180\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/variants/product/{{product_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "variants",
+                    "product",
+                    "{{product_id}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 201\", function () { pm.expect(pm.response.code).to.eql(201); });",
+                      "const json = pm.response.json();",
+                      "if (json && json.id) { pm.environment.set(\"variant_id\", json.id.toString()); }"
+                    ]
+                  }
+                }
+              ],
+              "response": []
+            },
+            {
+              "name": "Get Variants By Product",
+              "description": "Returns all variants for a product.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/variants/product/{{product_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "variants",
+                    "product",
+                    "{{product_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Variant By ID",
+              "description": "Returns a single variant by id.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/variants/{{variant_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "variants",
+                    "{{variant_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Variant",
+              "description": "Updates an existing variant.",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"sku\": \"OWM-1L-002\",\n  \"packSize\": 1,\n  \"unit\": \"L\",\n  \"price\": 185\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/variants/{{variant_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "variants",
+                    "{{variant_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Variant",
+              "description": "Deletes a variant by id.",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/variants/{{variant_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "variants",
+                    "{{variant_id}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Product Images",
+          "item": [
+            {
+              "name": "Get Product Images",
+              "description": "Returns all images associated with a product.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/product-images/product/{{product_id}}",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "product-images",
+                    "product",
+                    "{{product_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Primary Image",
+              "description": "Returns the primary image for a product.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/product-images/product/{{product_id}}/primary",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "product-images",
+                    "product",
+                    "{{product_id}}",
+                    "primary"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Generate Upload URL",
+              "description": "Creates a pre-signed upload URL and storage key for a new image. Validates fileName, contentType, and altText.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fileName\": \"organic-whole-milk.png\",\n  \"contentType\": \"image/png\",\n  \"altText\": \"Organic whole milk carton\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/product-images/product/{{product_id}}/upload-url",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "product-images",
+                    "product",
+                    "{{product_id}}",
+                    "upload-url"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Confirm Upload",
+              "description": "Confirms the image upload and stores the image against the product. Uses query parameters storageKey and displayOrder.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fileName\": \"organic-whole-milk.png\",\n  \"contentType\": \"image/png\",\n  \"altText\": \"Organic whole milk carton\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/product-images/product/{{product_id}}/confirm?storageKey=products/{{product_id}}/organic-whole-milk.png&displayOrder=1",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "product-images",
+                    "product",
+                    "{{product_id}}",
+                    "confirm"
+                  ],
+                  "query": [
+                    {
+                      "key": "storageKey",
+                      "value": "products/{{product_id}}/organic-whole-milk.png"
+                    },
+                    {
+                      "key": "displayOrder",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Image",
+              "description": "Deletes a product image by its image id.",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{product_base_url}}/api/v1/product/product-images/1",
+                  "host": [
+                    "{{product_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "product",
+                    "product-images",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "📊 INVENTORY SERVICE",
+      "item": [
+        {
+          "name": "Warehouses",
+          "item": [
+            {
+              "name": "Create Warehouse",
+              "description": "Creates a warehouse record. Required before inventory can be allocated to a warehouse.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"WH-NCR-01\",\n  \"name\": \"NoShop NCR Warehouse\",\n  \"city\": \"New Delhi\",\n  \"address\": \"Plot 12, Industrial Area, New Delhi\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/warehouses",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "warehouses"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test(\"Status code is 201\", function () { pm.expect(pm.response.code).to.eql(201); });",
+                      "const json = pm.response.json();",
+                      "if (json && json.id) { pm.environment.set(\"warehouse_id\", json.id.toString()); }"
+                    ]
+                  }
+                }
+              ],
+              "response": []
+            },
+            {
+              "name": "Get All Warehouses",
+              "description": "Returns all warehouse records.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/warehouses",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "warehouses"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Warehouse By ID",
+              "description": "Returns a warehouse by id.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/warehouses/{{warehouse_id}}",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "warehouses",
+                    "{{warehouse_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Activate Warehouse",
+              "description": "Activates the warehouse.",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/warehouses/{{warehouse_id}}/activate",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "warehouses",
+                    "{{warehouse_id}}",
+                    "activate"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Deactivate Warehouse",
+              "description": "Deactivates the warehouse.",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/warehouses/{{warehouse_id}}/deactivate",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "warehouses",
+                    "{{warehouse_id}}",
+                    "deactivate"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Inventory",
+          "item": [
+            {
+              "name": "Create Inventory Record",
+              "description": "Creates an inventory record for a product variant and warehouse. The request validates variantId, warehouseId, and quantity.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"variantId\": {{variant_id}},\n  \"warehouseId\": {{warehouse_id}},\n  \"quantity\": 50\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Inventory by Variant and Warehouse",
+              "description": "Returns the inventory record for a specific variant and warehouse combination.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory?variantId={{variant_id}}&warehouseId={{warehouse_id}}",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory"
+                  ],
+                  "query": [
+                    {
+                      "key": "variantId",
+                      "value": "{{variant_id}}"
+                    },
+                    {
+                      "key": "warehouseId",
+                      "value": "{{warehouse_id}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Inventory by Variant",
+              "description": "Returns all inventory records for a variant across warehouses.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/variant/{{variant_id}}",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "variant",
+                    "{{variant_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Inventory by Warehouse",
+              "description": "Returns all inventory rows stored in a warehouse.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/warehouse/{{warehouse_id}}",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "warehouse",
+                    "{{warehouse_id}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Inventory Quantity",
+              "description": "Updates the physical quantity for an inventory record using the inventory id in the path.",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 75\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/1",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Inventory Record",
+              "description": "Deletes an inventory record when no stock is reserved.",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/1",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "1"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Stock Operations",
+          "item": [
+            {
+              "name": "Add Stock",
+              "description": "Adds stock to a variant and warehouse combination.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/stock/add?variantId={{variant_id}}&warehouseId={{warehouse_id}}&quantity=10",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "stock",
+                    "add"
+                  ],
+                  "query": [
+                    {
+                      "key": "variantId",
+                      "value": "{{variant_id}}"
+                    },
+                    {
+                      "key": "warehouseId",
+                      "value": "{{warehouse_id}}"
+                    },
+                    {
+                      "key": "quantity",
+                      "value": "10"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Reduce Stock",
+              "description": "Reduces available stock for a variant and warehouse combination.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/stock/reduce?variantId={{variant_id}}&warehouseId={{warehouse_id}}&quantity=5",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "stock",
+                    "reduce"
+                  ],
+                  "query": [
+                    {
+                      "key": "variantId",
+                      "value": "{{variant_id}}"
+                    },
+                    {
+                      "key": "warehouseId",
+                      "value": "{{warehouse_id}}"
+                    },
+                    {
+                      "key": "quantity",
+                      "value": "5"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Reserve Stock",
+              "description": "Reserves available stock for downstream order workflows.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/stock/reserve?variantId={{variant_id}}&warehouseId={{warehouse_id}}&quantity=3",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "stock",
+                    "reserve"
+                  ],
+                  "query": [
+                    {
+                      "key": "variantId",
+                      "value": "{{variant_id}}"
+                    },
+                    {
+                      "key": "warehouseId",
+                      "value": "{{warehouse_id}}"
+                    },
+                    {
+                      "key": "quantity",
+                      "value": "3"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Release Stock",
+              "description": "Releases previously reserved stock back to the available pool.",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{access_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{inventory_base_url}}/api/v1/inventory/stock/release?variantId={{variant_id}}&warehouseId={{warehouse_id}}&quantity=3",
+                  "host": [
+                    "{{inventory_base_url}}"
+                  ],
+                  "path": [
+                    "api",
+                    "v1",
+                    "inventory",
+                    "stock",
+                    "release"
+                  ],
+                  "query": [
+                    {
+                      "key": "variantId",
+                      "value": "{{variant_id}}"
+                    },
+                    {
+                      "key": "warehouseId",
+                      "value": "{{warehouse_id}}"
+                    },
+                    {
+                      "key": "quantity",
+                      "value": "3"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "⚡ REDIS / CACHE TESTING",
+      "description": "The product service uses Redis caching with @Cacheable and @CacheEvict. These requests validate cache miss, cache hit, and eviction behavior without inventing fake Redis endpoints.",
+      "item": [
+        {
+          "name": "Get Product By ID — Cache Miss",
+          "description": "The first read for a product warms the Redis cache. This is expected to be a cache miss on the initial request.",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{product_base_url}}/api/v1/product/products/{{product_id}}",
+              "host": [
+                "{{product_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.expect(pm.response.code).to.eql(200); });",
+                  "console.log(\"Expected first access to warm the Redis cache.\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Get Product By ID — Cache Hit",
+          "description": "Request the same product again. This verifies the cache hit behavior from product-service Redis caching.",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{product_base_url}}/api/v1/product/products/{{product_id}}",
+              "host": [
+                "{{product_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.expect(pm.response.code).to.eql(200); });",
+                  "console.log(\"Expected second access to hit Redis.\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Update Product — Cache Eviction",
+          "description": "Updates the product and validates that the cache is evicted for that id. Uses the same DTO as product update.",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Organic Whole Milk\",\n  \"slug\": \"organic-whole-milk\",\n  \"description\": \"Updated organic whole milk for daily nutrition.\",\n  \"productType\": \"GROCERY\",\n  \"brandId\": {{brand_id}},\n  \"categoryId\": {{category_id}},\n  \"subCategoryId\": {{subcategory_id}}\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{product_base_url}}/api/v1/product/products/{{product_id}}",
+              "host": [
+                "{{product_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.expect(pm.response.code).to.eql(200); });",
+                  "console.log(\"The Redis cache key for this product should be evicted on update.\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Get Product By ID — After Eviction",
+          "description": "Fetches the same product after eviction to confirm the cache is rebuilt with fresh data.",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{product_base_url}}/api/v1/product/products/{{product_id}}",
+              "host": [
+                "{{product_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () { pm.expect(pm.response.code).to.eql(200); });",
+                  "console.log(\"This call should repopulate the product cache after eviction.\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Delete Product — Cache Eviction",
+          "description": "Deletes the product and validates that the Redis cache entry is removed.",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{product_base_url}}/api/v1/product/products/{{product_id}}",
+              "host": [
+                "{{product_base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "product",
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 204\", function () { pm.expect(pm.response.code).to.eql(204); });",
+                  "console.log(\"Delete should evict the product cache entry.\");"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    }
+  ]
+}
