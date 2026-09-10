@@ -92,10 +92,6 @@
 			<optional>true</optional>
 		</dependency>
 
-		<dependency>
-			<groupId>com.noshop</groupId>
-			<artifactId>common-library</artifactId>
-		</dependency>
 
 		<!-- Tests -->
 		<dependency>
