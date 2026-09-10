@@ -13,7 +13,6 @@ import com.noshop.common.exception.ResourceNotFoundException;
 import com.noshop.common.exception.UnauthorizedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -70,8 +69,6 @@ public class AuthServiceImpl implements AuthService {
             );
         } catch (AuthenticationException ex) {
             throw new UnauthorizedException("Invalid email or password");
-        } catch (AuthenticationServiceException ex) {
-            throw new UnauthorizedException("Authentication service is unavailable");
         }
 
         User user = userRepository.findByEmail(email)
