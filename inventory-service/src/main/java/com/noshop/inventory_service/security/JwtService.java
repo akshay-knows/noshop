@@ -9,7 +9,10 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
+import java.util.List;
 
+/** Parses and validates JWTs issued by auth-service for inventory-service requests. */
 @Service
 public class JwtService {
 
@@ -18,26 +21,45 @@ public class JwtService {
 
     private SecretKey secretKey;
 
+    /** Builds the HMAC verification key once at startup. */
     @PostConstruct
     public void init() {
         secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
     }
 
+    /** Extracts the authenticated user's email from the token subject. */
     public String extractUsername(String token) {
         return extractClaims(token).getSubject();
     }
 
+    /** Extracts role authorities embedded by auth-service. */
+    public List<String> extractRoles(String token) {
+        Object value = extractClaims(token).get("roles");
+
+        if (value instanceof List<?> roles) {
+            return roles.stream().map(String::valueOf).toList();
+        }
+
+        if (value instanceof String role) {
+            return List.of(role);
+        }
+
+        return List.of();
+    }
+
+    /** Returns true when the JWT signature and expiration are valid. */
     public boolean isTokenValid(String token) {
         try {
             Claims claims = extractClaims(token);
             return claims.getSubject() != null
                     && claims.getExpiration() != null
-                    && !claims.getExpiration().before(new java.util.Date());
+                    && !claims.getExpiration().before(new Date());
         } catch (Exception ex) {
             return false;
         }
     }
 
+    /** Parses and verifies the signed JWT payload. */
     private Claims extractClaims(String token) {
         return Jwts.parser()
                 .verifyWith(secretKey)
