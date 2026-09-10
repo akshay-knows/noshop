@@ -76,7 +76,6 @@ public class InventoryServiceImpl implements InventoryService {
     @Transactional(readOnly = true)
     public List<InventoryResponse> getInventoryByWarehouse(Long warehouseId) {
         findWarehouse(warehouseId);
-
         return inventoryRepository.findByWarehouseId(warehouseId)
                 .stream()
                 .map(this::toResponse)
@@ -166,12 +165,11 @@ public class InventoryServiceImpl implements InventoryService {
         inventoryRepository.save(inventory);
     }
 
-    /** Releases previously reserved stock back into available stock. */
+    /** Releases previously reserved stock even when a warehouse has since been deactivated. */
     @Override
     @Transactional
     public void releaseStock(Long variantId, Long warehouseId, Integer quantity) {
         validateQuantity(quantity);
-        requireActiveWarehouse(findWarehouse(warehouseId));
 
         Inventory inventory = findInventory(variantId, warehouseId);
 
@@ -207,7 +205,7 @@ public class InventoryServiceImpl implements InventoryService {
         }
     }
 
-    /** Prevents stock mutations against an inactive warehouse. */
+    /** Prevents operational stock changes against an inactive warehouse. */
     private void requireActiveWarehouse(Warehouse warehouse) {
         if (!Boolean.TRUE.equals(warehouse.getActive())) {
             throw new InactiveWarehouseException(
