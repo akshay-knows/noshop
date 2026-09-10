@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -13,69 +14,51 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.List;
 
+/** Authenticates product-service requests with the signed JWT issued by auth-service. */
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
+    /** Reads, validates, and converts JWT claims into Spring Security authorities. */
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain)
-            throws ServletException, IOException {
-
-        System.out.println("========== JWT FILTER ==========");
-        System.out.println(request.getMethod() + " " + request.getRequestURI());
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain) throws ServletException, IOException {
 
         String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        System.out.println("Authorization Header : " + authHeader);
-
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            System.out.println("No Bearer Token");
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
+            String token = authHeader.substring(7);
 
-            String jwt = authHeader.substring(7);
+            if (jwtService.isTokenValid(token)
+                    && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            System.out.println("JWT : " + jwt);
-
-            String email = jwtService.extractUserName(jwt);
-
-            System.out.println("Email : " + email);
-
-            if (email != null &&
-                    SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                JwtUser jwtUser = new JwtUser(
-                        email,
-                        List.of(new SimpleGrantedAuthority("ROLE_USER"))
-                );
+                String username = jwtService.extractUsername(token);
+                var authorities = jwtService.extractRoles(token).stream()
+                        .map(SimpleGrantedAuthority::new)
+                        .toList();
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
-                                jwtUser,
+                                username,
                                 null,
-                                jwtUser.getAuthorities()
-                        );
+                                authorities);
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
-
-                System.out.println("Authentication Successful");
             }
-
-        } catch (Exception e) {
-
-            System.out.println("JWT ERROR");
-            e.printStackTrace();
-
+        } catch (Exception ex) {
             SecurityContextHolder.clearContext();
+            log.debug("JWT authentication failed for {} {}", request.getMethod(), request.getRequestURI());
         }
 
         filterChain.doFilter(request, response);
