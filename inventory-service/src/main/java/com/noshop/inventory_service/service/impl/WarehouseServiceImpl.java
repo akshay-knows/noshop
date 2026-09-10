@@ -13,26 +13,28 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/** Manages warehouse creation, lookup, activation, and deactivation. */
 @Service
 @RequiredArgsConstructor
 public class WarehouseServiceImpl implements WarehouseService {
 
     private final WarehouseRepository warehouseRepository;
 
+    /** Creates a warehouse with a unique business code and active status. */
     @Override
     @Transactional
     public WarehouseResponse createWarehouse(WarehouseRequest request) {
+        String code = request.getCode().trim();
 
-        if (warehouseRepository.existsByCode(request.getCode())) {
+        if (warehouseRepository.existsByCode(code)) {
             throw new DuplicateWarehouseException(
-                    "Warehouse already exists with code: " + request.getCode()
-            );
+                    "Warehouse already exists with code: " + code);
         }
 
         Warehouse warehouse = Warehouse.builder()
-                .code(request.getCode())
-                .name(request.getName())
-                .city(request.getCity())
+                .code(code)
+                .name(request.getName().trim())
+                .city(request.getCity().trim())
                 .address(request.getAddress())
                 .active(true)
                 .build();
@@ -40,59 +42,50 @@ public class WarehouseServiceImpl implements WarehouseService {
         return toResponse(warehouseRepository.save(warehouse));
     }
 
+    /** Returns one warehouse by identifier. */
     @Override
     @Transactional(readOnly = true)
     public WarehouseResponse getWarehouse(Long id) {
-
-        Warehouse warehouse = findWarehouse(id);
-
-        return toResponse(warehouse);
+        return toResponse(findWarehouse(id));
     }
 
+    /** Returns all configured warehouses. */
     @Override
     @Transactional(readOnly = true)
     public List<WarehouseResponse> getAllWarehouses() {
-
         return warehouseRepository.findAll()
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
+    /** Activates a warehouse for normal inventory operations. */
     @Override
     @Transactional
     public WarehouseResponse activateWarehouse(Long id) {
-
         Warehouse warehouse = findWarehouse(id);
-
         warehouse.setActive(true);
-
         return toResponse(warehouseRepository.save(warehouse));
     }
 
+    /** Deactivates a warehouse without deleting its inventory history. */
     @Override
     @Transactional
     public WarehouseResponse deactivateWarehouse(Long id) {
-
         Warehouse warehouse = findWarehouse(id);
-
         warehouse.setActive(false);
-
         return toResponse(warehouseRepository.save(warehouse));
     }
 
+    /** Finds a warehouse or raises a domain-specific not-found exception. */
     private Warehouse findWarehouse(Long id) {
-
         return warehouseRepository.findById(id)
-                .orElseThrow(() ->
-                        new WarehouseNotFoundException(
-                                "Warehouse not found: " + id
-                        )
-                );
+                .orElseThrow(() -> new WarehouseNotFoundException(
+                        "Warehouse not found: " + id));
     }
 
+    /** Maps the persistence entity to the public warehouse response. */
     private WarehouseResponse toResponse(Warehouse warehouse) {
-
         return WarehouseResponse.builder()
                 .id(warehouse.getId())
                 .code(warehouse.getCode())
