@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="https://maven.apache.org/POM/4.0.0
-                             https://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="
+         http://maven.apache.org/POM/4.0.0
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
     <!-- ========================= -->
-    <!-- Parent POM -->
+    <!-- Parent -->
     <!-- ========================= -->
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
@@ -16,37 +19,47 @@
         <relativePath/>
     </parent>
 
+
     <!-- ========================= -->
     <!-- Project -->
     <!-- ========================= -->
+
     <groupId>com.noshop</groupId>
     <artifactId>noshop</artifactId>
     <version>1.0.0</version>
+
     <packaging>pom</packaging>
 
     <name>NoShop</name>
-    <description>Enterprise E-Commerce Microservices Platform</description>
+    <description>
+        Enterprise E-Commerce Microservices Platform
+    </description>
+
 
     <!-- ========================= -->
     <!-- Modules -->
     <!-- ========================= -->
+
     <modules>
 
         <!-- Infrastructure -->
+
         <module>common-library</module>
         <module>discovery-server</module>
         <module>api-gateway</module>
         <module>admin-server</module>
 
+
         <!-- Business Services -->
+
         <module>auth-service</module>
         <module>product-service</module>
         <module>inventory-service</module>
 
 
-        <!-- Future Services -->
-        <!--
+        <!-- Future -->
 
+        <!--
         <module>cart-service</module>
         <module>wishlist-service</module>
         <module>order-service</module>
@@ -58,117 +71,230 @@
 
     </modules>
 
+
     <!-- ========================= -->
-    <!-- Global Properties -->
+    <!-- Properties -->
     <!-- ========================= -->
+
     <properties>
 
         <java.version>17</java.version>
+
+        <!-- Spring -->
 
         <spring.cloud.version>2025.0.0</spring.cloud.version>
 
         <spring.boot.admin.version>3.5.10</spring.boot.admin.version>
 
+
+        <!-- Code Generation -->
+
         <mapstruct.version>1.6.3</mapstruct.version>
 
         <lombok.version>1.18.38</lombok.version>
 
-        <lombok.mapstruct.binding.version>0.2.0</lombok.mapstruct.binding.version>
+        <lombok.mapstruct.binding.version>
+            0.2.0
+        </lombok.mapstruct.binding.version>
 
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <project.build.sourceEncoding>
+            UTF-8
+        </project.build.sourceEncoding>
 
     </properties>
+
 
     <!-- ========================= -->
     <!-- Dependency Management -->
     <!-- ========================= -->
+
     <dependencyManagement>
 
         <dependencies>
 
+
             <!-- Spring Cloud -->
+
             <dependency>
+
                 <groupId>org.springframework.cloud</groupId>
-                <artifactId>spring-cloud-dependencies</artifactId>
-                <version>${spring.cloud.version}</version>
+
+                <artifactId>
+                    spring-cloud-dependencies
+                </artifactId>
+
+                <version>
+                    ${spring.cloud.version}
+                </version>
+
                 <type>pom</type>
+
                 <scope>import</scope>
+
             </dependency>
+
 
             <!-- Spring Boot Admin -->
+
             <dependency>
+
                 <groupId>de.codecentric</groupId>
-                <artifactId>spring-boot-admin-dependencies</artifactId>
-                <version>${spring.boot.admin.version}</version>
+
+                <artifactId>
+                    spring-boot-admin-dependencies
+                </artifactId>
+
+                <version>
+                    ${spring.boot.admin.version}
+                </version>
+
                 <type>pom</type>
+
                 <scope>import</scope>
+
             </dependency>
 
-            <!-- Internal Common Library -->
+
+            <!-- Internal Library -->
+
             <dependency>
+
                 <groupId>com.noshop</groupId>
-                <artifactId>common-library</artifactId>
-                <version>${project.version}</version>
+
+                <artifactId>
+                    common-library
+                </artifactId>
+
+                <version>
+                    ${project.version}
+                </version>
+
             </dependency>
+
 
         </dependencies>
 
     </dependencyManagement>
 
+
     <!-- ========================= -->
-    <!-- Plugin Management -->
+    <!-- Build -->
     <!-- ========================= -->
+
     <build>
+
+        <!-- Plugin Management -->
 
         <pluginManagement>
 
             <plugins>
 
+
                 <!-- Spring Boot -->
+
                 <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
+
+                    <groupId>
+                        org.springframework.boot
+                    </groupId>
+
+                    <artifactId>
+                        spring-boot-maven-plugin
+                    </artifactId>
+
                 </plugin>
 
-                <!-- Java Compiler -->
+
+                <!-- Compiler -->
+
                 <plugin>
 
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.14.0</version>
+                    <groupId>
+                        org.apache.maven.plugins
+                    </groupId>
+
+                    <artifactId>
+                        maven-compiler-plugin
+                    </artifactId>
+
+                    <version>
+                        3.14.0
+                    </version>
 
                     <configuration>
 
-                        <release>${java.version}</release>
+                        <release>
+                            ${java.version}
+                        </release>
+
 
                         <annotationProcessorPaths>
 
+
                             <!-- Lombok -->
+
                             <path>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                                <version>${lombok.version}</version>
+
+                                <groupId>
+                                    org.projectlombok
+                                </groupId>
+
+                                <artifactId>
+                                    lombok
+                                </artifactId>
+
+                                <version>
+                                    ${lombok.version}
+                                </version>
+
                             </path>
+
 
                             <!-- MapStruct -->
+
                             <path>
-                                <groupId>org.mapstruct</groupId>
-                                <artifactId>mapstruct-processor</artifactId>
-                                <version>${mapstruct.version}</version>
+
+                                <groupId>
+                                    org.mapstruct
+                                </groupId>
+
+                                <artifactId>
+                                    mapstruct-processor
+                                </artifactId>
+
+                                <version>
+                                    ${mapstruct.version}
+                                </version>
+
                             </path>
 
-                            <!-- Lombok + MapStruct -->
+
+                            <!-- Lombok MapStruct -->
+
                             <path>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok-mapstruct-binding</artifactId>
-                                <version>${lombok.mapstruct.binding.version}</version>
+
+                                <groupId>
+                                    org.projectlombok
+                                </groupId>
+
+                                <artifactId>
+                                    lombok-mapstruct-binding
+                                </artifactId>
+
+                                <version>
+                                    ${lombok.mapstruct.binding.version}
+                                </version>
+
                             </path>
+
 
                         </annotationProcessorPaths>
 
                     </configuration>
 
                 </plugin>
+
 
             </plugins>
 
