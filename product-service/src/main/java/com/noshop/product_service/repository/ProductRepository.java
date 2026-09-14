@@ -25,6 +25,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             LEFT JOIN FETCH p.subCategory
             WHERE p.id = :id
             """)
+
     Optional<Product> findByIdWithImages(@Param("id") Long id);
 
     boolean existsBySlugAndIdNot(String slug, Long id);

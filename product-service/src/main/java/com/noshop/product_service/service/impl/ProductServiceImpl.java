@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
+
     private static final int LOW_STOCK_THRESHOLD = 5;
 
     private final ProductRepository productRepository;

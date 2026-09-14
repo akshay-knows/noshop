@@ -6,8 +6,7 @@ import lombok.*;
 
 @Entity
 @Table(
-        name = "product_images",
-        uniqueConstraints = {
+name = "product_images", uniqueConstraints = {
                 @UniqueConstraint(
                         name = "uk_product_image_order",
                         columnNames = {"product_id", "display_order"}

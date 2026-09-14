@@ -1,6 +1,7 @@
 package com.noshop.product_service.entity;
 
 import com.noshop.product_service.enums.ProductStatus;
+import com.noshop.product_service.enums.Unit;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -33,8 +34,9 @@ public class ProductVariant {
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal packSize;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
-    private String unit;
+    private Unit unit;
 
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal price;

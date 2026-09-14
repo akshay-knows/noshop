@@ -1,13 +1,9 @@
 package com.noshop.product_service.util;
 
-import com.noshop.product_service.entity.Brand;
-import com.noshop.product_service.entity.Category;
-import com.noshop.product_service.entity.Product;
-import com.noshop.product_service.entity.ProductImage;
-import com.noshop.product_service.entity.ProductVariant;
-import com.noshop.product_service.entity.SubCategory;
+import com.noshop.product_service.entity.*;
 import com.noshop.product_service.enums.ImageSource;
 import com.noshop.product_service.enums.ProductStatus;
+import com.noshop.product_service.enums.Unit;
 import com.noshop.product_service.repository.BrandRepository;
 import com.noshop.product_service.repository.CategoryRepository;
 import com.noshop.product_service.repository.ProductRepository;
@@ -92,7 +88,7 @@ public class ProductDataSeeder implements CommandLineRunner {
             ProductVariant variant = ProductVariant.builder()
                     .sku("NOSHOP-SKU-" + number)
                     .packSize(BigDecimal.valueOf((number % 10) + 1L))
-                    .unit("UNIT")
+                                                   .unit(Unit.values()[number % Unit.values().length])
                     .price(BigDecimal.valueOf(50 + (number % 450)).setScale(2))
                     .status(ProductStatus.ACTIVE)
                     .product(product)

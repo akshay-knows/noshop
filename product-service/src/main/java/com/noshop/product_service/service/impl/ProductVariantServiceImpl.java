@@ -13,7 +13,7 @@ import com.noshop.product_service.service.ProductVariantService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.noshop.product_service.enums.Unit;
 import java.util.List;
 
 /** Manages product variants, SKUs, prices, and pack information. */
@@ -44,7 +44,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
         ProductVariant variant = ProductVariant.builder()
                 .sku(request.getSku().trim())
                 .packSize(request.getPackSize())
-                .unit(request.getUnit())
+                .unit(Unit.valueOf(request.getUnit()))
                 .price(request.getPrice())
                 .product(product)
                 .build();
@@ -99,7 +99,7 @@ public class ProductVariantServiceImpl implements ProductVariantService {
 
         variant.setSku(sku);
         variant.setPackSize(request.getPackSize());
-        variant.setUnit(request.getUnit());
+        variant.setUnit(Unit.valueOf(request.getUnit()));
         variant.setPrice(request.getPrice());
 
         return productMapper.toVariantResponse(

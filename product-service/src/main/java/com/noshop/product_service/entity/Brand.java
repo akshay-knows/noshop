@@ -27,6 +27,7 @@ public class Brand {
 
     private String logoUrl;
 
+    @Builder.Default
     private boolean active = true;
 
     @OneToMany(mappedBy = "brand")
