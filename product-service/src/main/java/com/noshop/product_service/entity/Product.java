@@ -1,5 +1,6 @@
 package com.noshop.product_service.entity;
 
+import com.noshop.product_service.enums.CatalogAudience;
 import com.noshop.product_service.enums.ProductStatus;
 import jakarta.persistence.*;
 import lombok.*;
@@ -32,11 +33,18 @@ public class Product {
     @Column(length = 50)
     private String productType;
 
-
     @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ProductStatus status = ProductStatus.ACTIVE;
+
+    /**
+     * Controls which customer segment can see the product.
+     * Null is treated as BOTH for backward compatibility with existing rows.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(length = 10)
+    private CatalogAudience audience = CatalogAudience.BOTH;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "brand_id", nullable = false)
