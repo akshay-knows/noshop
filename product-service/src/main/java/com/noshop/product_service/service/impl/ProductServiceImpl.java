@@ -6,12 +6,15 @@ import com.noshop.common.exception.DuplicateResourceException;
 import com.noshop.common.exception.OperationNotAllowedException;
 import com.noshop.common.exception.ResourceNotFoundException;
 import com.noshop.product_service.dto.request.CreateProductRequest;
+import com.noshop.product_service.dto.response.ProductRecommendationResponse;
 import com.noshop.product_service.dto.response.ProductResponse;
 import com.noshop.product_service.entity.Brand;
 import com.noshop.product_service.entity.Category;
 import com.noshop.product_service.entity.Product;
 import com.noshop.product_service.entity.ProductImage;
+import com.noshop.product_service.entity.ProductVariant;
 import com.noshop.product_service.entity.SubCategory;
+import com.noshop.product_service.enums.CatalogAudience;
 import com.noshop.product_service.enums.ProductStatus;
 import com.noshop.product_service.event.ProductCreatedEvent;
 import com.noshop.product_service.event.ProductVariantEvent;
@@ -22,8 +25,11 @@ import com.noshop.product_service.outbox.OutboxStatus;
 import com.noshop.product_service.repository.BrandRepository;
 import com.noshop.product_service.repository.CategoryRepository;
 import com.noshop.product_service.repository.ProductImageRepository;
+import com.noshop.product_service.repository.ProductRecommendationCandidate;
 import com.noshop.product_service.repository.ProductRepository;
+import com.noshop.product_service.repository.ProductVariantRepository;
 import com.noshop.product_service.repository.SubCategoryRepository;
+import com.noshop.product_service.security.CatalogAudienceResolver;
 import com.noshop.product_service.service.ProductService;
 import com.noshop.product_service.service.S3Service;
 import lombok.RequiredArgsConstructor;
@@ -34,21 +40,25 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
-/** Handles product lifecycle, catalog reads, search, cache invalidation, and events. */
+/**
+ * Handles product lifecycle, catalog reads, search, caching, recommendations,
+ * and integration events.
+ */
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
 
-
-    private static final int LOW_STOCK_THRESHOLD = 5;
-
     private final ProductRepository productRepository;
+    private final ProductVariantRepository productVariantRepository;
     private final BrandRepository brandRepository;
     private final CategoryRepository categoryRepository;
     private final SubCategoryRepository subCategoryRepository;
@@ -57,8 +67,8 @@ public class ProductServiceImpl implements ProductService {
     private final S3Service s3Service;
     private final OutboxEventRepository outboxEventRepository;
     private final ObjectMapper objectMapper;
+    private final CatalogAudienceResolver audienceResolver;
 
-    /** Creates a product and stores its integration event in the transactional outbox. */
     @Override
     @Transactional
     public ProductResponse createProduct(CreateProductRequest request) {
@@ -86,14 +96,14 @@ public class ProductServiceImpl implements ProductService {
         product.setBrand(brand);
         product.setCategory(category);
         product.setSubCategory(subCategory);
+        product.setAudience(normalizeAudience(request.getAudience()));
 
         Product savedProduct = productRepository.save(product);
         createProductCreatedOutboxEvent(savedProduct);
 
-        return productMapper.toResponse(savedProduct);
+        return toProductResponse(savedProduct);
     }
 
-    /** Returns a filtered page of products and attaches their images in one batch query. */
     @Override
     @Transactional(readOnly = true)
     public Page<ProductResponse> getAllProducts(
@@ -102,49 +112,38 @@ public class ProductServiceImpl implements ProductService {
             ProductStatus status,
             Pageable pageable) {
 
-        Page<Product> products;
-
-        if (categoryId != null && subCategoryId != null && status != null) {
-            products = productRepository.findByCategoryIdAndSubCategoryIdAndStatus(
-                    categoryId, subCategoryId, status, pageable);
-        } else if (categoryId != null && subCategoryId != null) {
-            products = productRepository.findByCategoryIdAndSubCategoryId(
-                    categoryId, subCategoryId, pageable);
-        } else if (categoryId != null && status != null) {
-            products = productRepository.findByCategoryIdAndStatus(
-                    categoryId, status, pageable);
-        } else if (subCategoryId != null && status != null) {
-            products = productRepository.findBySubCategoryIdAndStatus(
-                    subCategoryId, status, pageable);
-        } else if (categoryId != null) {
-            products = productRepository.findByCategoryId(categoryId, pageable);
-        } else if (subCategoryId != null) {
-            products = productRepository.findBySubCategoryId(subCategoryId, pageable);
-        } else if (status != null) {
-            products = productRepository.findByStatus(status, pageable);
-        } else {
-            products = productRepository.findAll(pageable);
-        }
+        Page<Product> products = productRepository.findCatalogProducts(
+                audienceResolver.allowedAudiences(),
+                categoryId,
+                subCategoryId,
+                status,
+                pageable);
 
         return mapProductsWithImages(products);
     }
 
-    /** Returns one product and caches the mapped response for ten minutes. */
     @Override
     @Transactional(readOnly = true)
-    @Cacheable(value = "products", key = "#id")
+    @Cacheable(
+            value = "products",
+            keyGenerator = "productCacheKeyGenerator"
+    )
     public ProductResponse getProductById(Long id) {
         Product product = productRepository.findByIdWithImages(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Product not found with id: " + id));
 
-        return productMapper.toResponse(product);
+        if (!audienceResolver.isVisible(product.getAudience())) {
+            throw new ResourceNotFoundException(
+                    "Product not available for the current customer segment");
+        }
+
+        return toProductResponse(product);
     }
 
-    /** Updates a product and evicts its cached representation. */
     @Override
     @Transactional
-    @CacheEvict(value = "products", key = "#id")
+    @CacheEvict(value = "products", allEntries = true)
     public ProductResponse updateProduct(Long id, CreateProductRequest request) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -175,14 +174,14 @@ public class ProductServiceImpl implements ProductService {
         product.setBrand(brand);
         product.setCategory(category);
         product.setSubCategory(subCategory);
+        product.setAudience(normalizeAudience(request.getAudience()));
 
-        return productMapper.toResponse(productRepository.save(product));
+        return toProductResponse(productRepository.save(product));
     }
 
-    /** Deletes a product, its owned images, and associated database records. */
     @Override
     @Transactional
-    @CacheEvict(value = "products", key = "#id")
+    @CacheEvict(value = "products", allEntries = true)
     public void deleteProduct(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -197,7 +196,6 @@ public class ProductServiceImpl implements ProductService {
         productRepository.delete(product);
     }
 
-    /** Searches product names and descriptions using the repository search query. */
     @Override
     @Transactional(readOnly = true)
     public Page<ProductResponse> searchProducts(String query, Pageable pageable) {
@@ -206,13 +204,15 @@ public class ProductServiceImpl implements ProductService {
         }
 
         return mapProductsWithImages(
-                productRepository.searchProducts(query.trim(), pageable));
+                productRepository.searchCatalogProducts(
+                        audienceResolver.allowedAudiences(),
+                        query.trim(),
+                        pageable));
     }
 
-    /** Changes product status while preventing a discontinued product from being reactivated. */
     @Override
     @Transactional
-    @CacheEvict(value = "products", key = "#id")
+    @CacheEvict(value = "products", allEntries = true)
     public ProductResponse updateProductStatus(Long id, ProductStatus status) {
         if (status == null) {
             throw new IllegalArgumentException("Product status is required");
@@ -229,10 +229,73 @@ public class ProductServiceImpl implements ProductService {
         }
 
         product.setStatus(status);
-        return productMapper.toResponse(productRepository.save(product));
+        return toProductResponse(productRepository.save(product));
     }
 
-    /** Writes the product-created event to the database outbox in the same transaction as the product. */
+    @Override
+    @Transactional(readOnly = true)
+    public List<ProductRecommendationResponse> getSubstitutes(Long id, int limit) {
+        int safeLimit = Math.min(Math.max(limit, 1), 10);
+
+        Product original = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Product not found with id: " + id));
+
+        if (!audienceResolver.isVisible(original.getAudience())) {
+            throw new ResourceNotFoundException(
+                    "Product not available for the current customer segment");
+        }
+
+        BigDecimal originalPrice = productVariantRepository.findByProductId(id)
+                .stream()
+                .filter(variant -> variant.getStatus() == ProductStatus.ACTIVE)
+                .map(ProductVariant::getPrice)
+                .filter(price -> price != null)
+                .min(Comparator.naturalOrder())
+                .orElse(null);
+
+        if (originalPrice == null) {
+            return Collections.emptyList();
+        }
+
+        Set<CatalogAudience> allowedAudiences = audienceResolver.allowedAudiences();
+
+        return productRepository.findRecommendationCandidates(
+                        allowedAudiences,
+                        original.getCategory().getId(),
+                        id,
+                        ProductStatus.ACTIVE)
+                .stream()
+                .sorted(Comparator.comparing(
+                        candidate -> candidate.getPrice()
+                                .subtract(originalPrice)
+                                .abs()))
+                .limit(safeLimit)
+                .map(candidate -> ProductRecommendationResponse.builder()
+                        .productId(candidate.getId())
+                        .name(candidate.getName())
+                        .slug(candidate.getSlug())
+                        .price(candidate.getPrice())
+                        .priceDifference(
+                                candidate.getPrice()
+                                        .subtract(originalPrice)
+                                        .abs())
+                        .build())
+                .toList();
+    }
+
+    private CatalogAudience normalizeAudience(CatalogAudience audience) {
+        return audience == null ? CatalogAudience.BOTH : audience;
+    }
+
+    private ProductResponse toProductResponse(Product product) {
+        ProductResponse response = productMapper.toResponse(product);
+        if (response.getAudience() == null) {
+            response.setAudience(CatalogAudience.BOTH);
+        }
+        return response;
+    }
+
     private void createProductCreatedOutboxEvent(Product product) {
         ProductCreatedEvent event = ProductCreatedEvent.builder()
                 .productId(product.getId())
@@ -265,7 +328,6 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    /** Ensures the selected subcategory actually belongs to the selected category. */
     private void validateSubCategoryBelongsToCategory(
             SubCategory subCategory,
             Long categoryId) {
@@ -275,25 +337,27 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
-    /** Maps a page of products and batches image lookup to avoid N+1 image queries. */
     private Page<ProductResponse> mapProductsWithImages(Page<Product> products) {
         List<Long> productIds = products.getContent().stream()
                 .map(Product::getId)
                 .toList();
 
         if (productIds.isEmpty()) {
-            return products.map(productMapper::toResponse);
+            return products.map(this::toProductResponse);
         }
 
-        Map<Long, List<ProductImage>> imagesByProductId = productImageRepository
-                .findByProductIdInOrderByDisplayOrderAsc(productIds)
-                .stream()
-                .collect(Collectors.groupingBy(image -> image.getProduct().getId()));
+        Map<Long, List<ProductImage>> imagesByProductId =
+                productImageRepository.findByProductIdInOrderByDisplayOrderAsc(productIds)
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                image -> image.getProduct().getId()));
 
         return products.map(product -> {
-            ProductResponse response = productMapper.toResponse(product);
+            ProductResponse response = toProductResponse(product);
+
             List<ProductImage> images = imagesByProductId.getOrDefault(
-                    product.getId(), Collections.emptyList());
+                    product.getId(),
+                    Collections.emptyList());
 
             response.setImages(images.stream()
                     .map(productMapper::toImageResponse)
