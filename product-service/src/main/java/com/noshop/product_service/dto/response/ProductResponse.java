@@ -1,5 +1,6 @@
 package com.noshop.product_service.dto.response;
 
+import com.noshop.product_service.enums.CatalogAudience;
 import lombok.Builder;
 import lombok.Data;
 
@@ -20,6 +21,8 @@ public class ProductResponse {
     private String productType;
 
     private String status;
+
+    private CatalogAudience audience;
 
     private Long brandId;
 
