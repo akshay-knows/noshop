@@ -1,5 +1,6 @@
 package com.noshop.product_service.dto.request;
 
+import com.noshop.product_service.enums.CatalogAudience;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -31,4 +32,9 @@ public class CreateProductRequest {
 
     @NotNull(message = "Sub-category ID is required")
     private Long subCategoryId;
+
+    /**
+     * Defaults to BOTH so existing clients remain compatible.
+     */
+    private CatalogAudience audience = CatalogAudience.BOTH;
 }
