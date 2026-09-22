@@ -25,9 +25,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Seeds realistic grocery catalog data for local development and API testing.
- */
 @Component
 @Order(10)
 @RequiredArgsConstructor
@@ -138,6 +135,7 @@ public class ProductDataSeeder implements CommandLineRunner {
 
         List<Brand> brands = ensureBrands();
         List<Category> categories = ensureCategories();
+
         ensureCuratedProducts(brands, categories);
 
         long existing = productRepository.count();
@@ -280,13 +278,14 @@ public class ProductDataSeeder implements CommandLineRunner {
         for (int i = 0; i < CATEGORY_NAMES.size(); i++) {
             String name = CATEGORY_NAMES.get(i);
             String slug = toSlug(name);
+            int displayOrder = i + 1;
 
             Category category = categoryRepository.findBySlug(slug)
                     .orElseGet(() -> categoryRepository.save(
                             Category.builder()
                                     .name(name)
                                     .slug(slug)
-                                    .displayOrder(i + 1)
+                                    .displayOrder(displayOrder)
                                     .active(true)
                                     .build()
                     ));
